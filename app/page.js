@@ -1,5 +1,10 @@
 'use client'
-// page_v13.js - kompletni prepis, sanitizace pomlcek pri ukladani (ne v renderu)
+// page_v14.js
+// Zmeny oproti v13:
+// - Renderer pro SKORE E-SHOPU: velke barevne cislo + progress bary oblasti X/10
+// - Renderer pro CO DELA DOBRE: zelena sekce
+// - Nove labely v italic renderu: Proc to funguje, Odhadovany dopad
+// - 2 nove loading faze (skore, silne stranky)
 
 import { useState, useEffect, useRef } from 'react'
 
@@ -19,6 +24,8 @@ const LOADING_PHASES = [
   'Hodnotim copywriting a mikrotexty...',
   'Kontroluji vizualni hierarchii...',
   'Hledam konverzni bariery...',
+  'Identifikuji silne stranky e-shopu...',
+  'Vypocitavam celkove skore e-shopu...',
   'Prohledavam znalostni bazi KRIS...',
   'Aplikuji metodologii ESHOP BOOSTER...',
   'Vypocitavam dopad doporuceni...',
@@ -26,20 +33,16 @@ const LOADING_PHASES = [
   'Generuji CRO akcni plan...',
   'Sestavuji Quick Wins seznam...',
   'Overuji kompletnost analyzy...',
-  'Finalizuji doporuceni...',
-  'Posledni optimalizace...',
   'Pripravuji report pro klienta...',
 ]
 
 const HISTORY_KEY = 'kris_analyzy_v1'
 const MAX_HISTORY = 5
 
-// Sanitizace pomlcek - volana pri ulozeni textu
 function cleanDashes(text) {
   var result = ''
   for (var i = 0; i < text.length; i++) {
     var code = text.charCodeAt(i)
-    // en dash (8211) nebo em dash (8212) obklopen mezerami -> nahrad dvojteckou
     if ((code === 8211 || code === 8212) && i > 0 && i < text.length - 1) {
       var prev = text[i-1]
       var next = text[i+1]
@@ -103,7 +106,21 @@ function HistoryItem({ item, onOpen, onDelete }) {
   )
 }
 
-function renderLine(line, i) {
+// Pomocna: barva skore podle hodnoty
+function scoreColor(score) {
+  if (score >= 75) return '#4CAF50'
+  if (score >= 50) return '#FF6B00'
+  return '#ff4444'
+}
+
+// Pomocna: barva hodnoceni X/10
+function areaScoreColor(val) {
+  if (val >= 7) return '#4CAF50'
+  if (val >= 5) return '#FF6B00'
+  return '#ff4444'
+}
+
+function renderLine(line, i, lines) {
   var t = line.trim()
 
   // Preskoc oddelovace
@@ -125,7 +142,55 @@ function renderLine(line, i) {
     return out.length === 0 ? str : out
   }
 
-  // Sekce
+  // === SKORE E-SHOPU sekce ===
+  if (t.includes('SKORE') && t.includes('E-SHOPU') || t === 'SKORE E-SHOPU')
+    return <div key={i} style={{color:'#FFD700',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #FFD700',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
+
+  // Standalone cislo 0-100 = celkove skore
+  if (/^\d{1,3}$/.test(t)) {
+    var score = parseInt(t, 10)
+    if (score >= 0 && score <= 100) {
+      var col = scoreColor(score)
+      var label = score >= 75 ? 'Dobry stav' : score >= 50 ? 'Prumerny stav' : 'Potrebuje praci'
+      return (
+        <div key={i} style={{display:'flex',alignItems:'center',gap:'20px',margin:'16px 0',padding:'20px 24px',background:'#111',borderRadius:'12px',border:'2px solid ' + col}}>
+          <div style={{textAlign:'center',flexShrink:0}}>
+            <div style={{fontSize:'56px',fontWeight:'900',color:col,fontFamily:'Arial Black,Arial',lineHeight:'1'}}>{score}</div>
+            <div style={{fontSize:'11px',color:col,fontWeight:'700',letterSpacing:'2px',marginTop:'4px'}}>/ 100</div>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:'14px',fontWeight:'700',color:col,marginBottom:'6px',fontFamily:'Arial,sans-serif'}}>{label}</div>
+            <div style={{height:'10px',background:'#2a2a2a',borderRadius:'5px',overflow:'hidden'}}>
+              <div style={{height:'100%',width:score+'%',background:col,borderRadius:'5px',transition:'width 0.5s'}} />
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  // Oblast X/10 — format "Nazev oblasti: X/10"
+  var areaMatch = t.match(/^(.+?):\s*(\d+)\/10$/)
+  if (areaMatch) {
+    var areaName = areaMatch[1].trim()
+    var areaVal = parseInt(areaMatch[2], 10)
+    var aCol = areaScoreColor(areaVal)
+    return (
+      <div key={i} style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'8px',fontFamily:'Arial,sans-serif'}}>
+        <div style={{width:'200px',flexShrink:0,color:'#aaa',fontSize:'13px'}}>{areaName}</div>
+        <div style={{flex:1,height:'6px',background:'#2a2a2a',borderRadius:'3px',overflow:'hidden'}}>
+          <div style={{height:'100%',width:(areaVal*10)+'%',background:aCol,borderRadius:'3px'}} />
+        </div>
+        <div style={{width:'36px',textAlign:'right',color:aCol,fontSize:'13px',fontWeight:'700',flexShrink:0}}>{areaVal}/10</div>
+      </div>
+    )
+  }
+
+  // === CO DELA DOBRE sekce ===
+  if (t.includes('CO DELA DOBRE') || t.includes('CO DĚLÁ DOBŘE'))
+    return <div key={i} style={{color:'#4CAF50',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #4CAF50',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
+
+  // === Ostatni sekce ===
   if (t.includes('KRITICKE') || t.includes('KRITICK'))
     return <div key={i} style={{color:'#ff4444',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #ff4444',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
   if (t.includes('VYSOKA'))
@@ -150,7 +215,9 @@ function renderLine(line, i) {
   }
   if (t.startsWith('- ') || t.startsWith('* '))
     return <div key={i} style={{color:'#aaa',paddingLeft:'20px',marginTop:'5px',fontSize:'14px',fontFamily:'Arial,sans-serif'}}>{parseInline(t.slice(2))}</div>
-  if (/^(Proc to boli|Jak opravit|Jak na to|Dopad|Clarity signal|Jak overit):/.test(t))
+
+  // Italic labely — rozsireno o nova klicova slova z v10 promptu
+  if (/^(Proc to boli|Jak opravit|Jak na to|Dopad|Clarity signal|Jak overit|Proc to funguje|Odhadovany dopad):/.test(t))
     return <div key={i} style={{color:'#888',paddingLeft:'16px',marginTop:'4px',fontSize:'14px',fontFamily:'Arial,sans-serif',fontStyle:'italic'}}>{parseInline(t)}</div>
 
   return <div key={i} style={{color:'#ccc',marginTop:'6px',fontSize:'15px',fontFamily:'Arial,sans-serif',lineHeight:'1.7'}}>{parseInline(line)}</div>
