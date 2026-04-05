@@ -1,5 +1,5 @@
-// route_v6_edge_v6.js
-// Zmeny oproti v5: KB prejmenovana na v6, NO VERSION FOOTER pravidlo v system promptu
+// route_v6_edge_v7.js
+// Zmeny oproti v6: silnejsi NO DASH RULE s prikladem SPATNE/SPRAVNE
 
 export const runtime = 'edge'
 
@@ -185,7 +185,7 @@ TVOJE ULOHA: Analyzuj e-shop klienta na zaklade jeho URL a vytvor strukturovanou
 
 ${clarityInstruction}
 
-DULEZITE PRAVIDLO 1 – NO DASH RULE: Ve svem vystupu NIKDY nepouzivej pomlcky (znak minus nebo pomlcku) jako oddelovace nebo dekoraci. Misto nich pouzivej dvojtecku, tecku nebo novy radek.
+DULEZITE PRAVIDLO 1 – NO DASH RULE (ABSOLUTNI ZAKAZ): Ve svem vystupu NIKDY nepouzivej znak pomlcky jako oddelovac nebo dekoraci. Konkretne zakazane znaky: en dash (–), em dash (—), a pomlcka pouzita jako oddelovac v textu. Jedina vyjimka: pomlcka uvnitr slova (e-shop, self-service). Misto oddelovacu pouzivej VZDY dvojtecku nebo novy radek. Priklad SPATNE: "Analyza – vysledky – doporuceni". Priklad SPRAVNE: "Analyza: vysledky: doporuceni". Toto pravidlo je absolutni a nema vyjimky.
 
 DULEZITE PRAVIDLO 2 – NO VERSION FOOTER: Na konci analyzy NIKDY nepridavej radky s verzi, nazvem systemu ani zkratkami jako "KRIS v5", "KRIS analyza", "ESHOP BOOSTER metodologie v5" apod. Footer s autorstvim je reseny zvlast na urovni UI.
 

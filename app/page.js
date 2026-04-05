@@ -1,4 +1,4 @@
-'use client'
+// page_v9.js - sanitizace pomlcek z AI vystupu
 import { useState, useEffect, useRef } from 'react'
 
 const LOADING_PHASES = [
@@ -121,7 +121,16 @@ function parseInline(text) {
   return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts
 }
 
+function sanitizeDashes(text) {
+  // Nahrad en dash a em dash pouzite jako oddelovac za dvojtecku
+  return text
+    .replace(/ – /g, ': ')   // en dash " – " → ": "
+    .replace(/ — /g, ': ')   // em dash " — " → ": "
+    .replace(/ - /g, ' ')         // bezna pomlcka jako oddelovac → mezera
+}
+
 function renderAnalysis(text) {
+  text = sanitizeDashes(text)
   return text.split('\n').map((line, i) => {
     const trimmed = line.trim()
 
