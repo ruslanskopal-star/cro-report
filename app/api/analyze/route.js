@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+// Edge Runtime – no NextResponse needed
 
 // ============================================================
 // KRIS - Knowledge-based Report Intelligence System
@@ -9,7 +9,8 @@ import { NextResponse } from 'next/server'
 // + Microsoft Clarity metodologie (Vojta Mikula, Picards)
 // ============================================================
 
-export const maxDuration = 60
+export const runtime = 'edge'
+export const maxDuration = 300
 
 const KRIS_KNOWLEDGE_BASE = `
 # KRIS ZNALOSTNÍ BÁZE v6 – ESHOP BOOSTER METODOLOGIE
