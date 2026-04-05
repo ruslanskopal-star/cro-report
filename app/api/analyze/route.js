@@ -249,7 +249,7 @@ export async function POST(req) {
       if (pageMeta.description) metaContext += `- Meta description: "${pageMeta.description}"\n`
       if (pageMeta.h1) metaContext += `- H1: "${pageMeta.h1}"\n`
       if (pageMeta.h2Count !== undefined) metaContext += `- Pocet H2: ${pageMeta.h2Count}\n`
-      if (pageMeta.hasSchema !== undefined) metaContext += `- Schema.org: ${pageMeta.hasSchema ? 'ANO' : 'NE - chybi structured data'\n`
+      if (pageMeta.hasSchema !== undefined) metaContext += `- Schema.org: ${pageMeta.hasSchema ? 'ANO' : 'NE - chybi structured data'}\n`
       if (pageMeta.canonical) metaContext += `- Canonical: ${pageMeta.canonical}\n`
       metaContext += `Komentuj: je title SEO-optimalizovany? Meta description motivuje ke kliknuti? H1 obsahuje hlavni keyword? Schema.org nasazena?\n`
     } else {
