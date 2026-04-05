@@ -468,6 +468,8 @@ ${claritySection}
 
 TVOJE ÚLOHA: Analyzuj e-shop klienta a vytvoř strukturovanou CRO analýzu. Piš v češtině, konkrétně a akcionovatelně. Každé doporučení musí být specifické pro daný e-shop, ne obecné.
 
+DŮLEŽITÉ: Nezačínej odpověď žádnou hlavičkou jako "KRIS CRO ANALÝZA v6", "Knowledge-based Report Intelligence System" ani jiným názvem systému nebo datem. Začni rovnou obsahem analýzy - první řádek musí být sekce KRITICKE PRIORITY nebo kontext analýzy.
+
 POVINNÁ STRUKTURA ANALÝZY (dodržuj přesně tato označení):
 
 KRITICKE PRIORITY: [název problémové oblasti]
