@@ -34,6 +34,7 @@ const LOADING_PHASES = [
   'Sestavuji Quick Wins seznam...',
   'Overuji kompletnost analyzy...',
   'Pripravuji report pro klienta...',
+  'Kalibruji konverzni bariery...',
 ]
 
 const HISTORY_KEY = 'kris_analyzy_v1'
