@@ -4,11 +4,11 @@ import { NextResponse } from 'next/server'
 // KRIS - Knowledge-based Report Intelligence System
 // Engine postavený na metodologii ESHOP BOOSTER
 // + znalostní báze z blogu Ondřeje Ilinčeva (ilincev.com)
-// Verze 4.0 – vytěžený obsah článků (Batch 1–4, ~80 článků)
+// Verze 5.0 – vytěžený obsah článků (Batch 1–5, ~100 článků)
 // ============================================================
 
 const KRIS_KNOWLEDGE_BASE = `
-# KRIS ZNALOSTNÍ BÁZE v4 – ESHOP BOOSTER + ILINČEV METODOLOGIE
+# KRIS ZNALOSTNÍ BÁZE v5 – ESHOP BOOSTER + ILINČEV METODOLOGIE
 
 ## PRVNÍ DOJEM A DŮVĚRYHODNOST
 - Návštěvník si udělá první dojem za 0,1 sekundy – vizuální kvalita webu přímo ovlivňuje vnímanou důvěryhodnost
@@ -42,7 +42,7 @@ const KRIS_KNOWLEDGE_BASE = `
 ## KONKURENČNÍ VÝHODA A DIFERENCIACE
 - Většina firem tvrdí totéž: kvalita, servis, cena – to není diferenciace
 - Skutečná diferenciace: specializace na niku, rychlost, komunita, udržitelnost, garance
-- Konkurovat pouze cenou je sebevražda – vždy přijde někdo levnější (Čína, Amazon)
+- Konkurovat pouze cenou je sebevražda – vždy přijde někdo levnější (Čína, Amazon, Temu)
 - Brand funguje jako placebo – stejný produkt s lepším brandem zákazníci vnímají jako kvalitnější
 - AirBnB efekt: stejné bílé layouty, stejné sans-serif fonty → weby jsou zaměnitelné a neviditelné
 - Bezpečný design = průměrný design = neviditelný design; záměrně porušte jednu konvenci
@@ -60,6 +60,7 @@ const KRIS_KNOWLEDGE_BASE = `
 - Copywriting luxusu: smyslový jazyk, příběh produktu, původ materiálu
 - Zákaznická péče u luxusu: osobní přístup je nutnost, ne bonus
 - Veblenův efekt: neslevujte prémiové produkty – cena je součástí hodnoty
+- 5 chyb luxusního e-shopu: moc barev, málo whitespace, agresivní marketing/popupy/slevy, malé fotky, komplikovaný layout
 
 ## PSYCHOLOGIE DÁRKŮ A VÁNOCE
 - Obdarovaný si váží dárku průměrně jen na 82 % jeho skutečné ceny (studie)
@@ -69,15 +70,22 @@ const KRIS_KNOWLEDGE_BASE = `
 - Vánoce: zákazníci jsou ochotni platit více a nakupují impulzivně
 - Deadlines doručení (poslední termín objednání před Vánoci) = silný konverzní element
 
-## PRODUKTOVÉ STRÁNKY A FOTOGRAFIE
+## PRODUKTOVÉ STRÁNKY – 17 KLÍČOVÝCH ELEMENTŮ (behaviorální psychologie)
 - 75 % zákazníků považuje fotky za klíčové při rozhodování o koupi (Weebly)
 - 58 % zákazníků chce vidět produkt ze všech stran – minimum jsou 3–5 fotek
 - Každý 5. zákazník vrátí produkt, protože fotka neodpovídala realitě
+- Název: NIKDY nemíchejte jméno produktu s kategorií nebo vlastnostmi – 50 % e-shopů tuto chybu dělá
+- Foto: velké, ze všech stran, zoom funkce, 360° pohled, AR (brýle/oblečení na tělo), video
+- Hodnocení: počet hvězdiček + počet recenzí – bez počtu recenzí je hvězdičky nedostatečné
+- Cena: dejte ji do blízkosti tlačítka "přidat do košíku"
+- Skladovost: jasně viditelná (zelená = skladem, červená = není)
+- Live chat: zvyšuje konverze, stačí vidět možnost – reálně kontaktuje každý 100. zákazník
+- Upsell funguje 20× lépe než cross-sell; cross-sell max do 60 % ceny původního produktu
+- Popis: vlastními slovy, ne od výrobce (SEO + osobnost firmy)
 - Lifestyle fotky (produkt v kontextu) výrazně zvyšují konverze u oblečení, doplňků, nábytku
-- Zoom funkce na produktových fotkách je nutnost
 - Video produktu zvyšuje konverze až o 80 % u komplexnějších produktů
-- Popis produktu: zákazníci nečtou, skenují. Bullet pointy > odstavce. Nejdůležitější info první.
-- Dostupnost skladem musí být jasně viditelná (zelená = skladem, červená = vyprodáno)
+- Dostupnost skladem musí být jasně viditelná
+- Wishlist: průměrně ho používají 3 z 1000 zákazníků – sledujte v analytics
 
 ## VYPRODANÉ PRODUKTY – SPRÁVNÝ POSTUP
 - Dočasně nedostupný produkt bez alternativy = 99 % uživatelů odchází ke konkurenci okamžitě
@@ -93,6 +101,7 @@ const KRIS_KNOWLEDGE_BASE = `
 - Uživatelé tráví pohledem 80 % času na levé části obrazovky
 - Drobečková navigace: lokační (kde jste) a atributová (aktivní filtry)
 - Interní vyhledávání: zákazníci kteří vyhledávají konvertují 2–3× lépe než ti co browsují
+- Kategorie vs. filtr: kategorie = buď/anebo; filtr = kombinovatelné vlastnosti (barva + velikost + materiál)
 
 ## INTERNÍ VYHLEDÁVÁNÍ NA E-SHOPU
 - Zákazníci kteří použijí vyhledávání konvertují 2–3× lépe – prioritizujte tuto funkci
@@ -130,6 +139,8 @@ const KRIS_KNOWLEDGE_BASE = `
 - Statistická signifikance min. 95 %, ideálně 99 %
 - Testujte vždy jen jednu hypotézu s jasným důvodem
 - Nejlepší věci k testování (sestupně): nadpis/headline, text CTA, cena dopravy, pořadí produktů
+- A/B testy personalizace a segmentace ztrojnásobují potenciální zvýšení obratu
+- 97,5 % jsou A/B testy, 1 % A/A testy, 1 % multivariační, 0,5 % personalizace
 
 ## A/A TESTOVÁNÍ – PŘED KAŽDÝM A/B TESTEM
 - A/A test = testujete dvě identické verze stránky – žádná změna obsahu
@@ -196,6 +207,9 @@ const KRIS_KNOWLEDGE_BASE = `
 - Obchodní podmínky: "Kliknutím na Koupit souhlasíte s OP" místo checkboxu
 - Minimalizujte počet polí ve formuláři – každé extra pole snižuje konverze
 - U dobírky uveďte "lze platit hotově i kartou" (70 % e-shopů tuto info nemá)
+- Slevový kupon: spíše jako textový odkaz než pole (zákazníci odcházejí hledat kód a nevrátí se)
+- Persistentní košík: zákazník se vrátí a najde zboží v košíku
+- 93 % lidí by nakoupilo více, kdyby byla doprava zdarma
 
 ## PŘÍSTUPNOST A TESTOVÁNÍ UX
 - Od června 2025 povinná přístupnost pro e-shopy nad určitou velikost (EU zákon)
@@ -227,32 +241,183 @@ const KRIS_KNOWLEDGE_BASE = `
 - Registraci navrhujte až na děkovací stránce (1 pole: "Uložit vaše údaje? Zadejte heslo:")
 - Sociální login (Google, Facebook) = méně tření, více konverzí
 - Zapomenuté heslo: posílejte reset link, ne dočasné heslo
+- Příliš přísné požadavky na heslo = ztráta 18 % uživatelů
 
 ## PRŮMĚRNÁ HODNOTA OBJEDNÁVKY (AOV)
 - Zvyšovat AOV: upsell/cross-sell, balíčky, množstevní slevy, doplňkové služby
 - Hranici dopravy zdarma nastavte mírně nad průměrnou AOV – zákazník si přiloží produkt
 - POZOR: agresivní slevy zvyšují AOV, ale snižují marži – sledujte marži na objednávku, ne jen AOV
+- Upsell v detailu produktu nebo jako upgrade v (před)košíku
+- Upsell ideální kde malý cenový rozdíl = velký výkonnostní rozdíl (elektronika, hosting)
+- Sledujte: konverzní poměr, marže, LTV zákazníků, počet kusů v objednávce
 
-## RECENZE A SOCIÁLNÍ DŮKAZ
+## RECENZE A SOCIÁLNÍ DŮKAZ (6 druhů social proof)
 - Recenze jsou nejsilnější trust signál – 92 % zákazníků čte recenze před nákupem
 - Perfektní 5.0 je podezřelé – optimum je 4,2–4,7
 - Recenze s fotkami konvertují 2× lépe než textové
 - Odpovídejte na negativní recenze veřejně
 - Pod 10 recenzí zákazníci nedůvěřují; 50+ je solidní základ
 - Recenze žádejte e-mailem 7–14 dní po doručení = nejvyšší response rate
+- Největší efekt mají první 1–5 recenzí; produkt s 5 recenzemi se prodává o 50 % víc
+- Každá hvězdička navíc na Yelp = +5–9 % obratu restaurace (HBR studie)
+- Loga klientů: nejsnáze zapamatovatelný typ social proof (ConversionXL)
+- Testimonials: umístěte jako "koření" po celém webu u CTA, ne jen na speciální stránku
+- Reverzní ohlas (Sean de Souza): 6 otázek = strukturovaný testimonial
+- User stats: počty zákazníků, objednávek, hodnocení
+- Certifikáty a ocenění, PR zmínky v médiích
+- Negativní recenze první = spouštíte řetězovou reakci dalších negativních
 
-## CENOTVORBA A PSYCHOLOGIE CEN (EU regulace 2023)
+## CENOTVORBA A PSYCHOLOGIE CEN (EU regulace 2023) + 38 TIPŮ
 - EU regulace: zobrazujte nejnižší cenu za posledních 30 dní jako referenční
 - Škrtnutá cena musí být skutečná předchozí cena
 - Psychologické ceny: 999 Kč > 1 000 Kč; zaokrouhlené ceny = signál luxusu
-- Kotevní cena: nejdražší varianta vlevo mění vnímání ostatních cen
+- Kotevní cena: nejdražší varianta vlevo/první mění vnímání ostatních cen
 - Příliš velká sleva snižuje vnímanou kvalitu produktu
+- Přeškrtnutou cenu dejte NAD nebo NALEVO od aktuální ceny
+- Splátky: 5 × 999 Kč je vnímáno lépe než 5 000 Kč (zákazník porovnává výši splátky)
+- Cena za den: ideálně pod 20–50 Kč pro denně používané produkty (fitko: "19 Kč/den")
+- Cena v levém dolním rohu = vnímána jako nižší
+- Začít množstvím, pak cenou: zákazník vnímá výhodu, ne náklady
+- Velikost písma ceny ovlivňuje vnímanou výši
+- Bez teček: 2500 Kč > 2.500 Kč (méně číslic = vnímáno jako levnější)
+- Přesná cena (ne kulatá) = vyšší vnímaná hodnota (studie 27 000 prodejů nemovitostí)
+- Červená barva ceny pro muže zvyšuje impulzní nákupy (vzrušení → emocionální rozhodnutí)
+- Slevy drahých produktů ukončit opatrně: zákazníci pak kupují levnější varianty
+- 5 % sleva = musíte prodat o 20 % víc (ztráta marže vs. objem)
+- Nejdražší produkt v kategorii na první řadě = zbytek vypadá levněji (vzor Alza)
+- Tip: neřaďte kategorii od nejlevnějšího – mixujte podle ceny, marže, skladovosti
+
+## LAKOMEC VS. MARNOTRATNÍK – CENOVÁ CITLIVOST
+- Zákazníci se liší v tom, jak moc je "bolí" platit
+- Lakomci (tightwads ~24 %): snižte vnímanou bolest platby – splátky, denní cena, slovo "jen", "malý poplatek"
+- Marnotratníci (spendthrifts ~15 %): dejte jim šanci utrácet více – upsell, prémiové varianty, exkluzivita
+- Pragmatici (většina): racionální zdůvodnění koupě
+- Citlivost na cenu se dramaticky liší odvětvím: benzín vs. dovolená vs. zdraví
+- Pokud část platí zaměstnavatel nebo je odečitatelná z daní → citlivost na cenu klesá
+- Platba rozdělit mezi více lidí = každý platí méně = méně bolí
+- Lidi potřebují mít pocit, že cena je férová – zdůvodněte ji
+
+## NEDOSTATEK (Scarcity) – PRINCIP FOMO
+- FOMO (fear of missing out) = jeden z nejsilnějších psychologických principů
+- Studie: svobodný muž vs. zadaný muž → zájem žen vzrostl z 59 % na 90 %
+- Nedostatek MNOŽSTVÍ > nedostatek ČASU (méně předvídatelné = cennější)
+- Funguje u produktů, co nejsou jinde dostupné; u komodit NE
+- Musí být pravda! Falešný nedostatek: zákazníci to odhalí a ztratíte důvěryhodnost
+- Příklady: Bonami (u ikony košíku), ZOOT (odpočet v předkošíku), Alza (trháky dne)
+- Booking.com = mistr nedostatku (ale eticky diskutabilní)
+- Riziko "mrzáčka, co nikdo nechtěl" u posledního kusu méně populárních produktů – testujte
+- Před odesláním e-mailu o opuštěném košíku: zkontrolujte, zda se zboží nevyprodalo!
+
+## KOGNITIVNÍ ZKRESLENÍ PRO E-SHOPY
+- Využití 6 kognitivních zkreslení umožní přetáhnout od konkurence 72–94 % zákazníků
+- Choice Overload (paralýza výběrem): příliš mnoho možností = žádná volba
+  → Max 2–4 varianty produktů/plánů; zvýrazněte "doporučenou" variantu
+- Anchoring (kotvení): první cena je kotva pro všechna další vnímání
+  → Nejdražší varianta první; přeškrtnutá cena vlevo/nad aktuální
+- FOMO/Scarcity: chceme co nemůžeme mít nebo je to těžké získat
+  → Omezené množství, časové nabídky (musí být pravdivé!)
+- Peak-End Rule: zákazník si pamatuje vrchol a konec zážitku
+  → Děkovná stránka a packaging jsou klíčové (moment radosti)
+- Confirmation Bias: hledáme potvrzení svého rozhodnutí
+  → Post-purchase e-maily ujišťující "udělali jste správné rozhodnutí"
+- Context Effect: prostředí ovlivňuje celé vnímání
+  → Typografie, whitespace, vizuální hierarchie = celkový vjem webu
+
+## PERSONALIZACE – TYPICKÝ ZÁKAZNÍK NEEXISTUJE
+- Typický uživatel neexistuje (Adolphe Quetelet, 1830) – průměr jako design základ je chyba
+- Pilotní kabina pro průměrného pilota = sedí nikomu → personalizace je nutností
+- Netflix vydělá díky personalizaci ~1 mld. USD ročně
+- Personalizace pro e-shopy: bannery/slevy/popupy (Heuréka uživatel = cenově citlivý), doporučené produkty, opuštěný košík, drip kampaně, retargeting, frekvence nákupů
+- Segmentace: lokalita, nový vs. vracející se, algoritmické segmenty (AI predikce)
+- Jak začít: KPI → analýza stávajícího stavu → tvorba segmentů → co jim ukázat → měření
+- A/B testy personalizace ztrojnásobují potenciální nárůst obratu
+- Ze všech A/B testů tvoří personalizace jen 0,5 % – obrovský nevyužitý potenciál
+- Pro opravdovou personalizaci (ne produktová doporučení) potřebujete hodně dat a konverzí
+
+## TRANSAKČNÍ E-MAILY – NEVYUŽITÝ POTENCIÁL
+- Transakční e-maily = 3–4× vyšší open rate a proklikovost než marketingové e-maily
+- Jsou jako polibky: zákazník se na ně TĚŠÍ (inicioval je sám svou akcí)
+- Legendární příklad: CD Baby – 20 000 zpětných odkazů za 20 minut práce na textu e-mailu
+- 19 typů transakčních e-mailů: potvrzení objednávky, odeslání zásilky, reklamace, hlídací pes, zapomenuté heslo, stav věrnostních bodů, uznání/neuznání reklamace, zpoždění, změna v objednávce atd.
+- Posílejte z info@vasobchod.cz, newsletters z newsletter@sub.domena.cz (jiná doména = ochrana reputace)
+- Pište jako byste to říkali dobrému zákazníkovi – ne úředními frázemi
+- Nejsou to marketingové e-maily – neupsellujte agresivně (riziko spam složky)
+- Zamyslete se: je každý e-mail nutný? Nedají se sloučit? (co nejméně = co nejlépe)
+
+## DĚKOVNÁ STRÁNKA – 3.–5. NEJNAVŠTĚVOVANĚJŠÍ STRÁNKA
+- Základní informace: co zákazník objednal + kdy to dorazí + na jaký e-mail jde potvrzení
+- Telefonický kontakt výrazně zvyšuje důvěryhodnost a snižuje buyer's remorse
+- Registrace: stačí se zeptat na heslo "Uložit vaše údaje?" = navýšení registrací
+- Sdílení: funguje pokud tím pomůžete (Liftago: sleva pro kamaráda, Harry's: 100 000 e-mailů za týden)
+- Dotazník spokojenosti: pokud se zákazníků zeptáte těsně po nákupu, produkt si víc oblíbí
+- Sleva na příští nákup: testujte, zda to funguje lépe pro nové vs. vracející se zákazníky
+- Fotka majitele nebo zodpovědné osoby = "lidi nakupují od lidí, ne od počítačů"
+- Surprise gift (ebook, infografika, konzultace zdarma) = ideální pro konverzi na prémiovou verzi
+- Příklad: správná děkovná stránka vedla k +52 % obratu (dokumentovaný případ)
+- Upsell možný, ale dejte pozor aby nepohřbil hlavní CTA (sledování objednávky)
+
+## PRODEJNÍ TEXT A COPYWRITING
+- 95 % internetu je text; 80 % všech úspěšných A/B testů jsou změny textu
+- Wall Street Journal prodejní text (Martin Conroy, 1975): vydělal 1–2 miliardy USD za 28 let
+- Fáze uvědomění zákazníka (Schwartz): 1. Neví o problému → 2. Ví o problému → 3. Hledá řešení → 4. Zná vás → 5. Připraven koupit
+- Strategie textu: posuňte zákazníka z jeho fáze o krok vpřed (ne všichni jsou připraveni koupit)
+- Zákazníkům nepíšete o produktu, ale o VÝHODÁCH pro ně (emocionální benefity, ne technické funkce)
+- Harley-Davidson: "opravdu soutěží" s plastickou chirurgií a sporťáky, ne s jinými motorkami
+- Orwellova pravidla: krátce, jednoduše, aktivně, bez žargonu
+- Aktivní rod > trpný rod: "Artikel popisuje" > "Jsou popisovány"
+- Pozitivní formulace > negativní: "Přijďte včas" > "Nechoďte pozdě"
+- Zdůvodňujte spojkami: "Přírodní oleje pomáhají, ALE jak stárnete… PROTO…"
+- Jednoduchý text = inteligentní autor (paradox: složitost = vnímaná nižší inteligence)
+- 6 otázek před psaním: Cíl? Pro koho? Co říct? Kolik prostoru? Jaký dojem? Kolik času?
+
+## FORMULÁŘE NA MOBILU – 12 TIPŮ
+- Konverze na mobilu je 25–50 % té na desktopu – mobilní gap je reálný problém
+- 5 důvodů nižší mobilní konverze: bezpečnostní obavy (20 %), nešikovný detail produktu (19,6 %), obtížná navigace (19,3 %), nemožnost porovnávat (19,6 %), obtížné vyplňování formulářů (18,6 %)
+- Ptejte se jen na NEZBYTNÁ pole – každé extra pole snižuje konverze
+- Předvyberte obvyklé volby (80 %+ uživatelů volí stejně)
+- Steppery (+/-) místo dropdownu pro počty; slider místo dvou polí pro rozsah hodnot
+- Popis polí: NIKDY uvnitř pole (placeholder), vždy NAD polem nebo plovoucí label
+- Vždy správná klávesnice: type="tel", type="email", type="number", type="url"
+- Live validace (po opuštění pole): -22 % chyb, +22 % dokončení, +31 % spokojenost (Luke Wroblewski)
+- Vždy zobrazte heslo (toggle) – 75 % uživatelů nedokončí nákup pokud musí žádat reset
+- Adresy: našeptávač až po 5+ znacích, max 10 položek, bez č.p. v našeptávači
+- Na mobilu při formulářích: orientace na výšku (90 % uživatelů), šířka pole max 300px
+- Tlačítko submit: sekundová prodleva po kliknutí (zabrání double-tap = dvojí objednávka)
+
+## OPUŠTĚNÝ KOŠÍK – ZÁCHRANNÁ SÉRIE
+- 2/3 lidí si dá něco do košíku a nedokončí objednávku
+- 8 % z těch co opustí košík lze přemluvit e-mailem k dokončení
+- 72 % lidí co dokončí nákup po připomenutí to udělá do 12 hodin
+- Série 3 e-mailů: do 20 minut (konverze 5,2 %), do 1 hodiny (4,5 %), do 24 hodin (2,6 %)
+- 44 % otevře e-mail; 11 % klikne; 30 % z klikajících dokončí nákup
+- AOV opuštěného košíku je o 14 % vyšší než průměr (hodnotnější zákazníci)
+- E-mail musí obsahovat: velké obrázky produktů, tlačítko "Dokončit nákup" (HTML, ne obrázek), trust signály, kontakt na podporu
+- Slevu nabídněte AŽ ve 3. e-mailu – nepodřezávejte si marži zbytečně
+- E-mail nepsat vyčítavě nebo nátlakově – spíše jako kamarádské připomenutí
+- Ptejte se na e-mail CO NEJDŘÍVE v objednávce – zachytíte i ty co odpadnou dříve
+- Urgenci (vyprodá se!) používejte JEN pokud je to pravda – zkontrolujte sklad před odesláním
+
+## FILTROVÁNÍ PRODUKTŮ
+- Jen 16 % velkých e-shopů má rozumně navržené filtrování (Baymard Institut)
+- Filtrování ≠ řazení – nikdy je nemíchejte dohromady
+- Každá kategorie musí mít VLASTNÍ specifické filtry (ne jeden filtr pro vše jako Bonami)
+- Nejužitečnější filtry dejte nahoru (sledujte používanost přes analytics/Clarity)
+- Vždy umožněte kombinaci více filtrů najednou (AND logika, ne OR)
+- Ukažte počet produktů odpovídající každé hodnotě filtru; 0 produktů = zašedlé, ne skryté
+- Použité filtry ukažte NAD výpisem produktů + možnost zrušit jeden nebo všechny
+- Seznamy vlastností nad 10 položek usekněte a skryjte za "Zobrazit více"
+- Kompatibilní produkty jako filtr: "kompatibilní s obsahem košíku" funguje nejlépe
+- Přidání filtrace produktů = nárůst obratu o 76 % (dokumentovaná případová studie)
+- Filtry s barvami: vždy jako barevné puntíky, ne text
+- Změny filtru = okamžité (bez tlačítka "Přepočítat"), jako samostatný krok v historii prohlížeče
 
 ## PŘÍPADOVKA: TRENÝRKÁRNA – 4× OBRAT ZA 6 LET
 - Filtry seřazeny podle skutečné používanosti (MS Clarity): Velikost → Značka → Barva
 - Použité filtry viditelné na začátku výpisu + tlačítko "Zrušit vše"
 - Barvy jako barevné puntíky (ne text)
 - Pamatování vybrané velikosti z filtru do detailu produktu
+- Slevový kupon: pole vizuálně potlačit a přejmenovat na "dárkový poukaz"
+- Ze 4 A/B testů: přidání slevového pole ke košíku snížilo konverze o 13 %
 
 ## PŘÍPADOVKA: ČESKÁ POJIŠŤOVNA – REDESIGN ZA 7 TÝDNŮ
 - Navigace musí odpovídat mentálnímu modelu zákazníka, ne org. struktuře firmy
@@ -286,17 +451,20 @@ const KRIS_KNOWLEDGE_BASE = `
 ## MOBILNÍ VERZE
 - Více než 60 % návštěvníků e-shopů přichází z mobilu, ale jen 30 % tam nakoupí
 - Formuláře: správný typ klávesnice (type="tel", type="email", type="number")
-- Tlačítka: minimální 44×44 px, dostatečné mezery
+- Tlačítka: minimální 44×44 px, dostatečné mezery (7×7mm, 2mm rozestupy)
 - Sticky košík / CTA tlačítko výrazně zvyšuje konverze
 - Každá sekunda navíc při načítání = 7 % pokles konverzí
 - Thumb zone: nejdůležitější akce do spodní části obrazovky
 - Vyhněte se animacím a paralax scrollingu na mobilu (motion sensitivity, výkon)
+- 90 % uživatelů drží mobil na výšku při formulářích – šířka pole max 300px
 
 ## EMAILOVÝ MARKETING A RETENCE
 - Získat nového zákazníka stojí 5–7× více než udržet stávajícího
-- Opuštěný košík: série 3 e-mailů (1h, 24h, 72h) – průměrná konverze 5–15 %
+- Opuštěný košík: série 3 e-mailů – průměrná konverze 5–15 %
 - Personalizace předmětu (jméno zákazníka) zvyšuje open rate o 26 %
 - Post-purchase sekvence: potvrzení + benefity → tracking → cross-sell po doručení → recenze po 7–14 dnech
+- Nejlepší čas na žádost o recenzi: 7–14 dní po doručení
+- Transakční e-maily: 3–4× vyšší open rate než marketing (využijte tento potenciál)
 
 ## DARK PATTERNS – ČEHO SE VYVAROVAT
 - Skryté poplatky v posledním kroku = nejčastější důvod opuštění košíku
@@ -377,7 +545,7 @@ STREDNI PRIORITA: [název sekce]
 QUICK WINS: Rychlé výhry (do 1 týdne)
 1. [co jde udělat rychle a levně]
 
-Analyzuj tyto oblasti: homepage a první dojem, produktové stránky a fotografie, navigace a kategorie, košík a checkout, trust signály a recenze, mobilní verze, ceny a slevy, copywriting a mikrotexty.
+Analyzuj tyto oblasti: homepage a první dojem, produktové stránky a fotografie, navigace a kategorie, košík a checkout, trust signály a recenze, mobilní verze, ceny a slevy, copywriting a mikrotexty, filtrování produktů, personalizace a e-mailing.
 
 Pokud konkrétní e-shop neznáš, vycházej z obecné praxe v dané kategorii produktů a aplikuj znalostní bázi KRIS.`
 
