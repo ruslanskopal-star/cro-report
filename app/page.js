@@ -39,7 +39,7 @@ const LOADING_PHASES = [
 
 const HISTORY_KEY = 'kris_analyzy_v1'
 const CHECKS_KEY = 'kris_checks_v1'
-const MAX_HISTORY = 5
+const MAX_HISTORY = 20
 
 function cleanDashes(text) {
   var result = ''
