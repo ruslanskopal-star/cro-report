@@ -339,7 +339,16 @@ Oblast | Odhadovany dopad
 Celkova delka: 1 strana A4 max.
 ` : `
 REZIM: PLNA ANALYZA
-ZAVAZNA STRUKTURA VYSTUPU — kazda analyza musi mit PRESNE tyto sekce v tomto poradi:
+
+KRITICKE: Vystup musi obsahovat PRESNE TYTO 4 SEKCE a nic jineho:
+1. SKORE E-SHOPU (s podskore oblasti)
+2. CO DELA DOBRE (3 body)
+3. TOP 5 QUICK WINS (kazdy s: Problem / Jak opravit / Odhadovany dopad / Jak overit v Clarity)
+4. CLARITY CHECKLIST (5 e-shop-specifickych polozek)
+
+ZAKAZANE SEKCE: Nepridavej ROADMAP, IMPLEMENTACNI PLAN, TYDENNI PLAN, DUVERYHODNOSTNI MATICE, CELKOVY POTENCIAL ani zadnou 5. sekci. Vystup konci po CLARITY CHECKLIST.
+
+---
 
 SKORE E-SHOPU
 [Cislo 0-100]
@@ -357,19 +366,6 @@ Kazdy Quick Win MUSI obsahovat vsechny 4 casti:
    Jak opravit: [krok po kroku, max 4 kroky]
    Odhadovany dopad: [cislo nebo %]
    Jak overit v Clarity: [konkretni krok]
-
-DUVERYHODNOSTNI MATICE
-Prvek | Aktualni stav | Priorita
-[Pro vsech 10 prvku ze znalostni baze, vzdy s emoji: ✅ ❌ ⚠️ ❓]
-
-ROADMAP IMPLEMENTACE
-Tyden 1: [max 5 polozek, kazda 1 radek]
-Tyden 2-4: [max 5 polozek]
-Mesic 2-3: [max 5 polozek]
-
-CELKOVY POTENCIAL
-Oblast | Odhadovany dopad
-[tabulka, vzdy 2 sloupce, 5-8 radku]
 
 ---
 ## CLARITY CHECKLIST
