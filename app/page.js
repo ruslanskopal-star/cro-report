@@ -1,10 +1,10 @@
 'use client'
-// page_v14.js
-// Zmeny oproti v13:
-// - Renderer pro SKORE E-SHOPU: velke barevne cislo + progress bary oblasti X/10
-// - Renderer pro CO DELA DOBRE: zelena sekce
-// - Nove labely v italic renderu: Proc to funguje, Odhadovany dopad
-// - 2 nove loading faze (skore, silne stranky)
+// page_v15.js
+// Zmeny oproti v14:
+// - Toggle TOP 10 (kratka verze) vs FULL (plna verze)
+// - Checkboxy na cislovanych polozkach (oznaceni hotovo)
+// - Stav checkboxu ulozen do localStorage per analyza
+// - Predano reportMode do API
 
 import { useState, useEffect, useRef } from 'react'
 
@@ -15,7 +15,7 @@ const LOADING_PHASES = [
   'Kontroluji fotografie a vizualy...',
   'Vyhodnocuji navigaci a kategorie...',
   'Testuju interni vyhledavani...',
-  'Analyzuji kosik a checkout...',
+  'Analyzuji objednavkovy proces...',
   'Kontroluji platebni metody...',
   'Hledam problemy s trust signaly...',
   'Kontroluji mobilni verzi...',
@@ -31,13 +31,13 @@ const LOADING_PHASES = [
   'Vypocitavam dopad doporuceni...',
   'Prioritizuji akcni kroky...',
   'Generuji CRO akcni plan...',
-  'Sestavuji Quick Wins seznam...',
-  'Overuji kompletnost analyzy...',
-  'Pripravuji report pro klienta...',
+  'Sestavuji seznam Quick Wins...',
   'Kalibruji konverzni bariery...',
+  'Pripravuji report pro klienta...',
 ]
 
 const HISTORY_KEY = 'kris_analyzy_v1'
+const CHECKS_KEY = 'kris_checks_v1'
 const MAX_HISTORY = 5
 
 function cleanDashes(text) {
@@ -45,9 +45,7 @@ function cleanDashes(text) {
   for (var i = 0; i < text.length; i++) {
     var code = text.charCodeAt(i)
     if ((code === 8211 || code === 8212) && i > 0 && i < text.length - 1) {
-      var prev = text[i-1]
-      var next = text[i+1]
-      if (prev === ' ' && next === ' ') {
+      if (text[i-1] === ' ' && text[i+1] === ' ') {
         result = result.slice(0, -1) + ':'
         continue
       }
@@ -89,7 +87,7 @@ function LoadingAnimation({ seconds, phase }) {
         </div>
       </div>
       <div style={{color:'#aaa',fontSize:'13px',fontFamily:'Arial,sans-serif',fontWeight:'600'}}>{phase}</div>
-      <div style={{marginTop:'10px',color:'#444',fontSize:'11px',fontFamily:'Arial,sans-serif'}}>Analyza trva cca 3 minuty</div>
+      <div style={{marginTop:'10px',color:'#444',fontSize:'11px',fontFamily:'Arial,sans-serif'}}>Analyza trva cca 2-3 minuty</div>
     </div>
   )
 }
@@ -99,7 +97,9 @@ function HistoryItem({ item, onOpen, onDelete }) {
     <div style={{display:'flex',alignItems:'center',gap:'10px',padding:'10px 14px',background:'#111',border:'1px solid #2a2a2a',borderRadius:'8px',marginBottom:'8px'}}>
       <div style={{flex:1,minWidth:0}}>
         <div style={{color:'#FF6B00',fontWeight:'700',fontSize:'13px',fontFamily:'Arial,sans-serif',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.url}</div>
-        <div style={{color:'#444',fontSize:'11px',fontFamily:'Arial,sans-serif',marginTop:'2px'}}>{item.date} &bull; {item.seconds}s</div>
+        <div style={{color:'#444',fontSize:'11px',fontFamily:'Arial,sans-serif',marginTop:'2px'}}>
+          {item.date} &bull; {item.seconds}s &bull; {item.mode === 'top10' ? 'TOP 10' : 'Plna analyza'}
+        </div>
       </div>
       <button onClick={() => onOpen(item)} style={{padding:'6px 14px',fontSize:'12px',fontWeight:'700',background:'#1a1a1a',border:'1px solid #FF6B00',color:'#FF6B00',borderRadius:'6px',cursor:'pointer',whiteSpace:'nowrap',flexShrink:0}}>Otevrit</button>
       <button onClick={() => onDelete(item.id)} style={{padding:'6px 10px',fontSize:'12px',background:'transparent',border:'1px solid #333',color:'#555',borderRadius:'6px',cursor:'pointer',flexShrink:0}}>x</button>
@@ -107,32 +107,26 @@ function HistoryItem({ item, onOpen, onDelete }) {
   )
 }
 
-// Pomocna: barva skore podle hodnoty
 function scoreColor(score) {
   if (score >= 75) return '#4CAF50'
   if (score >= 50) return '#FF6B00'
   return '#ff4444'
 }
 
-// Pomocna: barva hodnoceni X/10
 function areaScoreColor(val) {
   if (val >= 7) return '#4CAF50'
   if (val >= 5) return '#FF6B00'
   return '#ff4444'
 }
 
-function renderLine(line, i, lines) {
+function renderLine(line, i, checks, onToggleCheck, checkPrefix) {
   var t = line.trim()
-
-  // Preskoc oddelovace
   if (t === '---' || t === '***' || t === '') return <div key={i} style={{height:'4px'}} />
 
-  // Inline markdown: **bold** a *italic*
   function parseInline(str) {
     var out = []
     var re = /(\*\*([^*]+)\*\*|\*([^*]+)\*)/g
-    var last = 0
-    var m
+    var last = 0, m
     while ((m = re.exec(str)) !== null) {
       if (m.index > last) out.push(str.slice(last, m.index))
       if (m[2]) out.push(<strong key={m.index}>{m[2]}</strong>)
@@ -143,11 +137,10 @@ function renderLine(line, i, lines) {
     return out.length === 0 ? str : out
   }
 
-  // === SKORE E-SHOPU sekce ===
-  if (t.includes('SKORE') && t.includes('E-SHOPU') || t === 'SKORE E-SHOPU')
+  // Skore
+  if (t.includes('SKORE') && t.includes('E-SHOPU'))
     return <div key={i} style={{color:'#FFD700',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #FFD700',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
 
-  // Standalone cislo 0-100 = celkove skore
   if (/^\d{1,3}$/.test(t)) {
     var score = parseInt(t, 10)
     if (score >= 0 && score <= 100) {
@@ -162,7 +155,7 @@ function renderLine(line, i, lines) {
           <div style={{flex:1}}>
             <div style={{fontSize:'14px',fontWeight:'700',color:col,marginBottom:'6px',fontFamily:'Arial,sans-serif'}}>{label}</div>
             <div style={{height:'10px',background:'#2a2a2a',borderRadius:'5px',overflow:'hidden'}}>
-              <div style={{height:'100%',width:score+'%',background:col,borderRadius:'5px',transition:'width 0.5s'}} />
+              <div style={{height:'100%',width:score+'%',background:col,borderRadius:'5px'}} />
             </div>
           </div>
         </div>
@@ -170,15 +163,14 @@ function renderLine(line, i, lines) {
     }
   }
 
-  // Oblast X/10 — format "Nazev oblasti: X/10"
+  // Oblast X/10
   var areaMatch = t.match(/^(.+?):\s*(\d+)\/10$/)
   if (areaMatch) {
-    var areaName = areaMatch[1].trim()
     var areaVal = parseInt(areaMatch[2], 10)
     var aCol = areaScoreColor(areaVal)
     return (
       <div key={i} style={{display:'flex',alignItems:'center',gap:'12px',marginTop:'8px',fontFamily:'Arial,sans-serif'}}>
-        <div style={{width:'200px',flexShrink:0,color:'#aaa',fontSize:'13px'}}>{areaName}</div>
+        <div style={{width:'220px',flexShrink:0,color:'#aaa',fontSize:'13px'}}>{areaMatch[1].trim()}</div>
         <div style={{flex:1,height:'6px',background:'#2a2a2a',borderRadius:'3px',overflow:'hidden'}}>
           <div style={{height:'100%',width:(areaVal*10)+'%',background:aCol,borderRadius:'3px'}} />
         </div>
@@ -187,21 +179,25 @@ function renderLine(line, i, lines) {
     )
   }
 
-  // === CO DELA DOBRE sekce ===
+  // Sekce
   if (t.includes('CO DELA DOBRE') || t.includes('CO DĚLÁ DOBŘE'))
     return <div key={i} style={{color:'#4CAF50',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #4CAF50',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
-
-  // === Ostatni sekce ===
   if (t.includes('KRITICKE') || t.includes('KRITICK'))
     return <div key={i} style={{color:'#ff4444',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #ff4444',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
   if (t.includes('VYSOKA'))
     return <div key={i} style={{color:'#FF6B00',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #FF6B00',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
   if (t.includes('STREDNI'))
     return <div key={i} style={{color:'#ffcc00',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #ffcc00',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
-  if (t.includes('QUICK'))
+  if (t.includes('QUICK') || t.includes('WINS'))
     return <div key={i} style={{color:'#00ccff',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #00ccff',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
-  if (t.includes('DOPORUCENA') || t.includes('PRIORITIZACE') || t.includes('AKCNI'))
+  if (t.includes('TOP 10') || t.includes('AKCNI'))
+    return <div key={i} style={{color:'#FF6B00',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #FF6B00',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
+  if (t.includes('DUVERYHODNOSTNI') || t.includes('DŮVĚRYHODNOSTNÍ'))
+    return <div key={i} style={{color:'#cc88ff',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #cc88ff',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
+  if (t.includes('ROADMAP') || t.includes('IMPLEMENTACE'))
     return <div key={i} style={{color:'#aaffaa',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #4CAF50',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
+  if (t.includes('CELKOVY') || t.includes('POTENCIAL'))
+    return <div key={i} style={{color:'#FFD700',fontWeight:'700',fontSize:'17px',marginTop:'28px',marginBottom:'10px',borderLeft:'4px solid #FFD700',paddingLeft:'12px',fontFamily:'Arial Black,Arial'}}>{parseInline(t)}</div>
 
   if (line.startsWith('# '))
     return <div key={i} style={{color:'white',fontWeight:'900',fontSize:'22px',marginTop:'28px',marginBottom:'10px',fontFamily:'Arial Black,Arial'}}>{parseInline(line.slice(2))}</div>
@@ -210,16 +206,57 @@ function renderLine(line, i, lines) {
   if (line.startsWith('### '))
     return <div key={i} style={{color:'#ccc',fontWeight:'700',fontSize:'14px',marginTop:'16px',marginBottom:'4px'}}>{parseInline(line.slice(4))}</div>
 
-  if (/^\*?\*?\d+\./.test(t)) {
-    var cleaned = t.replace(/^\*\*(\d+\..+?)\*\*$/, '$1').replace(/^\*\*/, '')
-    return <div key={i} style={{color:'#ddd',marginTop:'14px',paddingLeft:'8px',fontFamily:'Arial,sans-serif',fontWeight:'600'}}>{parseInline(cleaned)}</div>
+  // Cislovane polozky s checkboxem
+  var numMatch = t.match(/^(\d+)\.\s+(.+)/)
+  if (numMatch) {
+    var num = numMatch[1]
+    var checkKey = checkPrefix + '_' + i
+    var isChecked = checks[checkKey] || false
+    var cleaned = numMatch[2].replace(/^\*\*(.+)\*\*$/, '$1')
+    return (
+      <div key={i} style={{display:'flex',alignItems:'flex-start',gap:'10px',marginTop:'14px',paddingLeft:'4px'}}>
+        <div
+          onClick={() => onToggleCheck(checkKey)}
+          style={{
+            flexShrink:0, marginTop:'3px',
+            width:'18px', height:'18px', borderRadius:'4px',
+            border:'2px solid ' + (isChecked ? '#4CAF50' : '#444'),
+            background: isChecked ? '#4CAF50' : 'transparent',
+            cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+            transition:'all 0.15s'
+          }}
+        >
+          {isChecked && <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        </div>
+        <div style={{color: isChecked ? '#555' : '#ddd', textDecoration: isChecked ? 'line-through' : 'none', fontFamily:'Arial,sans-serif',fontWeight:'600', transition:'all 0.15s'}}>
+          <span style={{color: isChecked ? '#555' : '#888', marginRight:'6px'}}>{num}.</span>
+          {parseInline(cleaned)}
+        </div>
+      </div>
+    )
   }
+
   if (t.startsWith('- ') || t.startsWith('* '))
     return <div key={i} style={{color:'#aaa',paddingLeft:'20px',marginTop:'5px',fontSize:'14px',fontFamily:'Arial,sans-serif'}}>{parseInline(t.slice(2))}</div>
 
-  // Italic labely — rozsireno o nova klicova slova z v10 promptu
-  if (/^(Proc to boli|Jak opravit|Jak na to|Dopad|Clarity signal|Jak overit|Proc to funguje|Odhadovany dopad):/.test(t))
+  if (/^(Proc to boli|Jak opravit|Jak na to|Dopad|Clarity signal|Jak overit|Proc to funguje|Odhadovany dopad|Proc:|Jak:|Dopad:)/.test(t))
     return <div key={i} style={{color:'#888',paddingLeft:'16px',marginTop:'4px',fontSize:'14px',fontFamily:'Arial,sans-serif',fontStyle:'italic'}}>{parseInline(t)}</div>
+
+  // Tabulkove radky (matice)
+  if (t.startsWith('|')) {
+    if (t.match(/^\|[-\s|]+\|$/)) return null
+    var cells = t.split('|').filter(c => c.trim())
+    var isHeader = cells.length > 0
+    return (
+      <div key={i} style={{display:'grid',gridTemplateColumns:`repeat(${cells.length}, 1fr)`,gap:'1px',marginTop:'2px'}}>
+        {cells.map((cell, ci) => (
+          <div key={ci} style={{padding:'6px 10px',background:'#222',fontSize:'13px',fontFamily:'Arial,sans-serif',color: isHeader && i < 5 ? '#FF6B00' : '#ccc',fontWeight: isHeader && i < 5 ? '700' : '400'}}>
+            {cell.trim()}
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return <div key={i} style={{color:'#ccc',marginTop:'6px',fontSize:'15px',fontFamily:'Arial,sans-serif',lineHeight:'1.7'}}>{parseInline(line)}</div>
 }
@@ -231,11 +268,15 @@ export default function Home() {
   var [analysis, setAnalysis] = useState('')
   var [displayUrl, setDisplayUrl] = useState('')
   var [withClarity, setWithClarity] = useState(true)
+  var [reportMode, setReportMode] = useState('full')
   var [seconds, setSeconds] = useState(0)
   var [phaseIndex, setPhaseIndex] = useState(0)
   var [history, setHistory] = useState([])
   var [totalSeconds, setTotalSeconds] = useState(null)
   var [copied, setCopied] = useState(false)
+  var [checks, setChecks] = useState({})
+  var [currentAnalysisId, setCurrentAnalysisId] = useState(null)
+  var [currentMode, setCurrentMode] = useState('full')
   var timerRef = useRef(null)
   var phaseRef = useRef(null)
 
@@ -243,6 +284,8 @@ export default function Home() {
     try {
       var saved = localStorage.getItem(HISTORY_KEY)
       if (saved) setHistory(JSON.parse(saved))
+      var savedChecks = localStorage.getItem(CHECKS_KEY)
+      if (savedChecks) setChecks(JSON.parse(savedChecks))
     } catch(e) {}
   }, [])
 
@@ -260,17 +303,16 @@ export default function Home() {
       clearInterval(timerRef.current)
       clearTimeout(phaseRef.current)
     }
-    return function() {
-      clearInterval(timerRef.current)
-      clearTimeout(phaseRef.current)
-    }
+    return function() { clearInterval(timerRef.current); clearTimeout(phaseRef.current) }
   }, [loading])
 
-  function saveToHistory(url, text, dur) {
-    var item = { id: Date.now(), url: url, analysis: text, date: new Date().toLocaleDateString('cs-CZ'), seconds: dur }
+  function saveToHistory(url, text, dur, mode) {
+    var id = Date.now()
+    var item = { id, url, analysis: text, date: new Date().toLocaleDateString('cs-CZ'), seconds: dur, mode }
     var updated = [item].concat(history).slice(0, MAX_HISTORY)
     setHistory(updated)
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(updated)) } catch(e) {}
+    return id
   }
 
   function deleteFromHistory(id) {
@@ -283,13 +325,13 @@ export default function Home() {
     setDisplayUrl(item.url)
     setAnalysis(item.analysis)
     setTotalSeconds(item.seconds)
+    setCurrentAnalysisId(item.id)
+    setCurrentMode(item.mode || 'full')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function handleNovaAnalyza() {
-    setAnalysis('')
-    setDisplayUrl('')
-    setTotalSeconds(null)
+    setAnalysis(''); setDisplayUrl(''); setTotalSeconds(null); setCurrentAnalysisId(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -311,12 +353,17 @@ export default function Home() {
     document.title = orig
   }
 
+  function handleToggleCheck(checkKey) {
+    setChecks(function(prev) {
+      var next = Object.assign({}, prev, { [checkKey]: !prev[checkKey] })
+      try { localStorage.setItem(CHECKS_KEY, JSON.stringify(next)) } catch(e) {}
+      return next
+    })
+  }
+
   async function handleAnalyze() {
     if (!clientUrl.trim()) return
-    setLoading(true)
-    setError('')
-    setAnalysis('')
-    setTotalSeconds(null)
+    setLoading(true); setError(''); setAnalysis(''); setTotalSeconds(null)
     var url = clientUrl.trim()
     var startTime = Date.now()
 
@@ -324,7 +371,7 @@ export default function Home() {
       var res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientUrl: url, withClarity: withClarity }),
+        body: JSON.stringify({ clientUrl: url, withClarity, reportMode }),
       })
 
       if (!res.ok || !res.body) {
@@ -336,8 +383,7 @@ export default function Home() {
 
       var reader = res.body.getReader()
       var decoder = new TextDecoder()
-      var accumulated = ''
-      var buffer = ''
+      var accumulated = '', buffer = ''
 
       while (true) {
         var result = await reader.read()
@@ -363,13 +409,17 @@ export default function Home() {
       setDisplayUrl(url)
       setAnalysis(clean)
       setTotalSeconds(elapsed)
+      setCurrentMode(reportMode)
       setClientUrl('')
-      saveToHistory(url, clean, elapsed)
+      var newId = saveToHistory(url, clean, elapsed, reportMode)
+      setCurrentAnalysisId(newId)
     } catch(e) {
       setError('Chyba spojeni: ' + e.message)
     }
     setLoading(false)
   }
+
+  var checkPrefix = currentAnalysisId ? String(currentAnalysisId) : 'preview'
 
   return (
     <>
@@ -378,7 +428,7 @@ export default function Home() {
           .no-print { display: none !important; }
           html, body { background: white !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           body > div { background: white !important; padding: 0 !important; }
-          .print-area { background: white !important; border: none !important; padding: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+          .print-area { background: white !important; border: none !important; padding: 0 !important; border-radius: 0 !important; }
           .print-area div { color: black !important; }
           @page { margin: 15mm; size: A4; }
         }
@@ -397,11 +447,12 @@ export default function Home() {
             <p style={{color:'#888',fontSize:'14px',marginTop:'0',marginBottom:'20px',textAlign:'center',fontFamily:'Arial,sans-serif'}}>
               Zadej web klienta a AI agent vygeneruje CRO analyzu podle metodologie ESHOP BOOSTER
             </p>
+
             <div style={{display:'flex',gap:'12px',marginBottom:'16px'}}>
               <input
                 value={clientUrl}
                 onChange={function(e) { setClientUrl(e.target.value) }}
-                placeholder="www.profi-dj.cz, eshop.cz, ..."
+                placeholder="www.eshop.cz"
                 onKeyDown={function(e) { if (e.key === 'Enter') handleAnalyze() }}
                 style={{flex:1,padding:'14px 18px',fontSize:'16px',background:'#111',border:'2px solid #333',borderRadius:'8px',color:'white',fontFamily:'Arial,sans-serif',outline:'none'}}
                 onFocus={function(e) { e.target.style.borderColor='#FF6B00' }}
@@ -416,6 +467,25 @@ export default function Home() {
               </button>
             </div>
 
+            {/* Toggle TOP 10 / FULL */}
+            <div style={{display:'flex',gap:'8px',marginBottom:'16px'}}>
+              <button
+                onClick={function() { setReportMode('top10') }}
+                style={{flex:1,padding:'10px',fontSize:'13px',fontWeight:'700',fontFamily:'Arial,sans-serif',background:reportMode==='top10'?'#FF6B00':'#111',color:reportMode==='top10'?'white':'#666',border:'2px solid ' + (reportMode==='top10'?'#FF6B00':'#333'),borderRadius:'8px',cursor:'pointer',transition:'all 0.2s'}}
+              >
+                TOP 10
+                <div style={{fontSize:'10px',fontWeight:'400',marginTop:'2px',opacity:0.8}}>Kratka verze · ~1 min</div>
+              </button>
+              <button
+                onClick={function() { setReportMode('full') }}
+                style={{flex:1,padding:'10px',fontSize:'13px',fontWeight:'700',fontFamily:'Arial,sans-serif',background:reportMode==='full'?'#FF6B00':'#111',color:reportMode==='full'?'white':'#666',border:'2px solid ' + (reportMode==='full'?'#FF6B00':'#333'),borderRadius:'8px',cursor:'pointer',transition:'all 0.2s'}}
+              >
+                PLNA ANALYZA
+                <div style={{fontSize:'10px',fontWeight:'400',marginTop:'2px',opacity:0.8}}>Kompletni report · ~2-3 min</div>
+              </button>
+            </div>
+
+            {/* Clarity toggle */}
             <div onClick={function() { setWithClarity(function(v) { return !v }) }} style={{display:'flex',alignItems:'center',gap:'10px',cursor:'pointer',userSelect:'none',padding:'10px 14px',borderRadius:'8px',background:withClarity?'#0d1f0d':'#1a1a1a',border:'1px solid ' + (withClarity?'#2a6b2a':'#333'),transition:'all 0.2s'}}>
               <div style={{width:'18px',height:'18px',borderRadius:'4px',border:'2px solid ' + (withClarity?'#4CAF50':'#555'),background:withClarity?'#4CAF50':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                 {withClarity && <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
@@ -423,9 +493,6 @@ export default function Home() {
               <div>
                 <div style={{color:withClarity?'#4CAF50':'#666',fontSize:'13px',fontWeight:'700',fontFamily:'Arial,sans-serif'}}>
                   {withClarity ? 'Mam pristup do Microsoft Clarity' : 'Nemam pristup do Microsoft Clarity'}
-                </div>
-                <div style={{color:'#555',fontSize:'11px',fontFamily:'Arial,sans-serif',marginTop:'2px'}}>
-                  {withClarity ? 'Analyza bude zahrnovat doporuceni pro heatmapy, rage clicks a session recordings' : 'Analyza bude postavena na best practices bez dat z Clarity'}
                 </div>
               </div>
             </div>
@@ -449,7 +516,12 @@ export default function Home() {
 
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'24px',paddingBottom:'16px',borderBottom:'2px solid #333'}}>
                 <div>
-                  <div style={{color:'#FF6B00',fontSize:'12px',fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',marginBottom:'4px'}}>AI CRO Analyza</div>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px'}}>
+                    <div style={{color:'#FF6B00',fontSize:'12px',fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase'}}>AI CRO Analyza</div>
+                    <div style={{padding:'2px 8px',background:currentMode==='top10'?'#FF6B00':'#333',borderRadius:'4px',fontSize:'10px',fontWeight:'700',color:'white'}}>
+                      {currentMode === 'top10' ? 'TOP 10' : 'FULL'}
+                    </div>
+                  </div>
                   <div style={{color:'white',fontSize:'22px',fontWeight:'900'}}>{displayUrl}</div>
                   {totalSeconds && <div style={{color:'#555',fontSize:'12px',fontFamily:'Arial,sans-serif',marginTop:'4px'}}>Vygenerovano za {totalSeconds}s</div>}
                 </div>
@@ -465,7 +537,9 @@ export default function Home() {
               </div>
 
               <div style={{fontFamily:'Arial,sans-serif',lineHeight:'1.7'}}>
-                {analysis.split('\n').map(function(line, i) { return renderLine(line, i) })}
+                {analysis.split('\n').map(function(line, i) {
+                  return renderLine(line, i, checks, handleToggleCheck, checkPrefix)
+                })}
               </div>
 
               <div style={{marginTop:'32px',paddingTop:'16px',borderTop:'1px solid #2a2a2a',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
@@ -476,7 +550,7 @@ export default function Home() {
           )}
 
           <p className="no-print" style={{textAlign:'center',color:'#333',fontSize:'12px',marginTop:'24px',fontFamily:'Arial,sans-serif'}}>
-            ESHOP BOOSTER 2026 &bull; KRIS v6 &bull; Ruslan Skopal
+            ESHOP BOOSTER 2026 &bull; KRIS v8 &bull; Ruslan Skopal
           </p>
         </div>
       </div>
