@@ -393,8 +393,8 @@ Pokud konkrétní e-shop neznáš, vycházej z obecné praxe v dané kategorii p
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 4000,
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8000,
         stream: true,
         system: systemPrompt,
         messages: [
