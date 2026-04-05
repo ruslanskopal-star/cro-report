@@ -3,8 +3,7 @@ export const runtime = 'edge'
 // ============================================================
 // KRIS - Knowledge-based Report Intelligence System
 // Engine postaveny na metodologii ESHOP BOOSTER
-// + znalostni baze z blogu Ondřeje Ilinceva (ilincev.com)
-// Verze 6.0 edge v3 - no-dash rule, sonnet-4-6, 8000 tokens
+// Verze 6.0 edge v4 - streaming SSE + no-dash rule
 // ============================================================
 
 const KRIS_KNOWLEDGE_BASE = `
@@ -193,16 +192,12 @@ const KRIS_KNOWLEDGE_BASE = `
 - KRITICKA CHYBA: neptejte se na dorucovaci adresu pri osobnim odberu (54 % e-shopu to dela)
 - Pamatujte si vyplnene udaje (56 % e-shopu si to nepamatuje)
 - Registraci navrhujte az na dekovaci strance - staci se zeptat na heslo (dela to jen 15 % e-shopu)
-- Obchodni podminky: "Kliknutils na Koupit souhlasiste s OP" misto checkboxu
 - Minimalizujte pocet poli ve formulari - kazde extra pole snizuje konverze
 - U dobirky uvette "lze platit hotove i kartou" (70 % e-shopu tuto info nema)
 
 ## PRISTUPNOST A TESTOVANI UX
 - Od cervna 2025 povinna pristupnost pro e-shopy nad urcitou velikost (EU zakon)
-- Testovani s levou rukou: simuluje omezenou motoriku - odhali problemy s velikosti prvku
-- Snizena svitivost displeje pri testovani: odhali problemy s kontrastem
 - Minimalni velikost dotykove plochy na mobilu: 7 x 7 mm s 2mm rozestupy
-- Vyhybejte se animacim pri motion sensitivity
 - Kontrastni pomer textu: minimalne 4,5:1 pro normalni text, 3:1 pro velky text
 - Formulare: labely musi byt viditelne - ne jen placeholder ktery zmizi pri psani
 - 5 uzivatelu odhali 85 % UX problemu (Jakob Nielsen)
@@ -211,22 +206,14 @@ const KRIS_KNOWLEDGE_BASE = `
 - Vetsina UX vyzkumu je znehodnocena sugestivnimi otazkami
 - Spatna otazka: "Libi se vam nas novy design?" - zakaznik rekne ano ze slusnosti
 - Spravna otazka: "Popiste mi, jak byste postupovali pri hledani produktu X" - behavioralni, otevrena
-- Nikdy nezacinejte rozhovor ukazkou reseni - nejdriv zmapujte problem a soucasne chovani
 - Ptejte se na minule chovani, ne na hypotetice budouci ("Koupili byste to?" je bezcenne)
 - 5 uzivatelu odhali 85 % UX problemu - nepotrebujete velky vzorek
-
-## PSYCHOLOGIE POZORNOSTI A SOUSTREDENI
-- Uzivatel udrzi soustredeni pri slozitem ukolu cca 20 minut; pri pasivnim browsovani jen 8 sekund
-- Systemova reakce do 100ms: uzivatel vnima jako okamzitou; 1s+ = frustrace a opusteni
-- Nenuttte uzivatele prepínat kontext: potvrzeni e-mailu mimo web = ztrata az 40 % uzivatelu
-- Zobrazujte dulezite informace ve stredu obrazovky nebo jako overlay - ne jako novou zalozku
 
 ## REGISTRACE A PRIHLASOVANI
 - Registrace pri objednavce = konverzni killer; nabizejte nakup bez registrace vzdy
 - Guest checkout je nutnost - zakaznik se zaregistruje sam pokud bude chtet
 - Registraci navrhujte az na dekovaci strance (1 pole: "Ulozit vase udaje? Zadejte heslo:")
 - Socialni login (Google, Facebook) = mene treni, vice konverzi
-- Zapomenute heslo: posilejte reset link, ne docasne heslo
 
 ## PRUMERNA HODNOTA OBJEDNAVKY (AOV)
 - Zvysovat AOV: upsell/cross-sell, balicky, mnozstevni slevy, doplnkove sluzby
@@ -237,13 +224,12 @@ const KRIS_KNOWLEDGE_BASE = `
 - Recenze jsou nejsilnejsi trust signal - 92 % zakazniku cte recenze pred nakupem
 - Perfektni 5.0 je podezrele - optimum je 4,2 az 4,7
 - Recenze s fotkami konvertuji 2x lepe nez textove
-- Odpovidejte na negativni recenze verejne
+- Odpovídejte na negativni recenze verejne
 - Pod 10 recenzi zakaznici neduvěruji; 50+ je solidni zaklad
 - Recenze zadejte e-mailem 7 az 14 dni po doruceni = nejvyssi response rate
 
 ## CENOTVORBA A PSYCHOLOGIE CEN (EU regulace 2023)
 - EU regulace: zobrazujte nejnizsi cenu za poslednich 30 dni jako referencni
-- Skrthnuta cena musi byt skutecna predchozi cena
 - Psychologicke ceny: 999 Kc > 1 000 Kc; zaokrouhlene ceny = signal luxusu
 - Kotevni cena: nejdrazsi varianta vlevo meni vnimani ostatnich cen
 - Prilis velka sleva snizuje vnimanou kvalitu produktu
@@ -254,127 +240,65 @@ const KRIS_KNOWLEDGE_BASE = `
 - Barvy jako barevne puntiky (ne text)
 - Pamatovani vybrane velikosti z filtru do detailu produktu
 
-## PRIPADOVKA: CESKA POJISTOVNA - REDESIGN ZA 7 TYDNU
-- Navigace musi odpovidat mentalnimu modelu zakaznika, ne org. strukture firmy
-- Kalkulacka: nejasny aktivni stav, neklikatelne prvky vypadajici klikatelne, 5 az 10s nacitani bez progress baru
-
-## PRIPADOVKA: FAKTUROID A SPA.CZ
-- Fakturoid: +48,3 % registraci - zjednoduseni onboardingu a jasny value prop
-- Spa.cz: +21,5 % objednavek - lepsi filtrovani, duveryhodnost, mobilni verze
-- Redesign = odstraneni konverznich barier, ne novy vizual
-
-## AMAZON - INOVACE V LOGISTICE A E-COMMERCE
-- Amazon Go (bezpokladenni obchody): kamery + pocitacove videni; platba automaticka pri odchodu
-- Amazon ma 10 000+ aktivnich patentu (2023) - desetinasobek oproti roku 2000
-- Anticipated shipping: balicky odesílány jeste pred objednavkou na zaklade AI predikce
-- Lekce pro e-shopy: logistika je nejsilnejsi Amazonova vyhoda - konkurujte specializaci a zakaznickym zazitkem, ne cenou
-
-## DESIGN ZAKLADY PRO VYVOJARE A NEDESIGNERY
-- Bily prostor (whitespace) = aktivni designovy prvek zvysujici citelnost, ne prazdne misto
-- Zarovnani: vse na strance by melo byt zarovnano na skrytou mrizku
-- Typografie: maximalne 2 rezy pisma; jasna hierarchie (H1 > H2 > body)
-- Primarni akcni barva: jen pro nejdulezitejsi akce (CTA tlacitko)
-- Gestalt principy: blízkost (co je blizko = patri k sobe), podobnost, kontinuita
-- Vizualni hierarchie: zakaznikovo oko sleduje design, ne obsah - navrhnte cestu oci
-
-## IKEA EFEKT - PSYCHOLOGIE VLASTNICTVI
-- Produkty ktere sami sestavime/vytvorime si cenime vice (Norton, Mochon, Ariely)
-- Aplikace na e-shop: konfigurator produktu, personalizace, sestaveni vlastniho balicku
-- Optimalni obtiznost: stredne narocne s jasne viditelnym vysledkem
-- Konfigurator zvysuje vnimanou hodnotu a snizuje pravdepodobnost vraceni
-
 ## MOBILNI VERZE
 - Více nez 60 % navstevniku e-shopu prichazi z mobilu, ale jen 30 % tam nakoupi
-- Formulare: spravny typ klavesnice (type="tel", type="email", type="number")
 - Tlacitka: minimalni 44x44 px, dostatecne mezery
 - Sticky kosik / CTA tlacitko vyrazne zvysuje konverze
 - Kazda sekunda navic pri nacitani = 7 % pokles konverzi
 - Thumb zone: nejdulezitejsi akce do spodni casti obrazovky
-- Vyhybejte se animacim a paralax scrollingu na mobilu (motion sensitivity, vykon)
 
 ## EMAILOVY MARKETING A RETENCE
 - Ziskat noveho zakaznika stoji 5 az 7x vice nez udrzet stavajiciho
 - Opusteny kosik: serie 3 e-mailu (1h, 24h, 72h) - prumerna konverze 5 az 15 %
 - Personalizace predmetu (jmeno zakaznika) zvysuje open rate o 26 %
-- Post-purchase sekvence: potvrzeni + benefity, tracking, cross-sell po doruceni, recenze po 7 az 14 dnech
 
 ## DARK PATTERNS - CEHO SE VYVAROVAT
 - Skryte poplatky v poslednim kroku = nejcastejsi duvod opusteni kosiku
 - Predvybrane souhlasy s newsletterem nebo pojistenim jsou v EU nelegalni
-- Falesna urgence poskozuje brand dlouhodobe
-- Confirmshaming, roach motel, skryte predplatne = regulatorni riziko (EU DSA)
-
-## DESIGN JE MANIPULACE - PSYCHOLOGIE
-- Kazde UX rozhodnuti ovlivnuje chovani uzivatele - design nikdy neni neutralni
-- Nudge theory: male podnety vedou k zadoucimu chovani
-- Barvy: cervena = urgence, zelena = bezpeci/potvrdit, modra = duvera
-- F-pattern a Z-pattern: nejdulezitejsi info do leveho horniho rohu
-- FOMO: omezena dostupnost zvysuje hodnotu; Endowment effect: "30 dni na vraceni" funguje
-
-## CHECKBOXY A PRAVNI UX
-- Prilis mnoho souhlasu frustuje uzivatele a snizuje konverze
-- Predvybrane souhlasy jsou v EU nelegalni
-- Souhlas s OP: "Kliknutim na Koupit souhlasiste s OP" misto checkboxu
-
-## COOKIES A GDPR
-- Zadne predzaskrtnute checkboxy - cisty opt-in
-- "Odmitnout vse" musi byt stejne snadne jako "Prijmout vse"
-- Bez odsouhlaseni nesmiite ukladat zadna data - ani analyticka
-
-## PREDPLATNE A SUBSCRIPTION MODELY
-- Rocni predplatne vydela 2x vice pri spravnem nastaveni ceny a komunikace
-- Uspora musi byt okamzite zrejma v Kc i v %
-- Nejlepsi moment pro nabidku rocniho: ihned po registraci a pri 1. obnove mesicniho
+- Falešna urgence poskozuje brand dlouhodobe
 
 ## AI A AUTOMATIZACE V E-COMMERCE
 - AI personalizace doporuceni zvysuje AOV prumerne o 10 az 30 %
 - Chatboty: funguji pro FAQ, selhavaji u komplexnich problemu
 - Automatizace e-mailovych sekvenci = nejvyssi ROI z automation
-
-## OBSAH KTERY DLOUHODOBE ZVYSUJE PRODEJE
-- Vzdelavaci obsah buduje autoritu a organicky traffic - nejlevnejsi dlouhodoby marketing
-- Nejlepsi formaty: pruvodci "jak na X", srovnani produktu, pripadove studie, FAQ
-- Evergreen obsah >> trendovy obsah pro dlouhodobe vysledky
-- Produktovy obsah: reseni konkretniho problemu zakaznika > technicke parametry
 `
 
 export async function POST(req) {
-  try {
-    const { clientName, withClarity } = await req.json()
+  const { clientName, withClarity } = await req.json()
 
-    if (!clientName) {
-      return new Response(JSON.stringify({ success: false, error: 'Chybi jmeno klienta' }), {
-        headers: { 'Content-Type': 'application/json' }
-      })
-    }
+  if (!clientName) {
+    return new Response(JSON.stringify({ success: false, error: 'Chybi nazev klienta' }), {
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) {
-      return new Response(JSON.stringify({ success: false, error: 'API klic neni nastaven' }), {
-        headers: { 'Content-Type': 'application/json' }
-      })
-    }
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) {
+    return new Response(JSON.stringify({ success: false, error: 'API klic neni nastaven' }), {
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
 
-    const clarityInstruction = withClarity
-      ? 'Klient MA pristup do Microsoft Clarity - zahrnuj doporuceni tykajici se heatmap, nahravek sessions a analyzy chovani uzivatelu.'
-      : 'Klient NEMA pristup do Microsoft Clarity - analyza bude postavena pouze na best practices bez dat z Clarity.'
+  const clarityInstruction = withClarity
+    ? 'Klient MA pristup do Microsoft Clarity - zahrnuj doporuceni tykajici se heatmap, nahravek sessions a analyzy chovani uzivatelu.'
+    : 'Klient NEMA pristup do Microsoft Clarity - analyza bude postavena pouze na best practices bez dat z Clarity.'
 
-    const systemPrompt = `Jsi KRIS - Knowledge-based Report Intelligence System, expert CRO analytik e-shopu metodologie ESHOP BOOSTER.
+  const systemPrompt = `Jsi KRIS - Knowledge-based Report Intelligence System, expert CRO analytik e-shopu metodologie ESHOP BOOSTER.
 
 Tvá znalostni baze:
 ${KRIS_KNOWLEDGE_BASE}
 
-PRAVIDLA FORMATOVANI VYSTUPU - DULEZITE:
-- NIKDY nepouzivej dlouhou pomlcku (tento znak: -) ani kratkou pomlcku jako oddelovac vety
-- Pokud potrebujes oddelit mysleni, pouzij pouze " - " (mezera, pomlcka, mezera) a jen vyjimecne
-- Preferuj teckove vety, dvojtecku nebo zavorky misto pomlcek
+PRAVIDLA FORMATOVANI VYSTUPU:
+- NIKDY nepouzivej dlouhou pomlcku ani kratkou pomlcku jako oddelovac vety
+- Pokud potrebujes vyjadrit rozsah nebo oddelit mysleni, pis slovy: "az", "nebo", "a take"
 - Nepouzivej pomlcky v nadpisech ani v sekci titulech
+- Preferuj dvojtecku nebo zavorky misto pomlcek
 
-TVOJE ULOHA: Analyzuj e-shop klienta a vytvor strukturovanou CRO analyzu. Pis v cestine, konkretne a akcionovatelne. Kazde doporuceni musi byt specificke pro dany e-shop, ne obecne.
+TVOJE ULOHA: Analyzuj e-shop klienta a vytvor strukturovanou CRO analyzu. Pis v cestine, konkretne a akcionovatelne.
 
 ${clarityInstruction}
 
-POVINNA STRUKTURA ANALYZY (dodrzuj presne tato oznaceni pro spravne zobrazeni):
+POVINNA STRUKTURA ANALYZY:
 
 KRITICKE PRIORITY: [nazev sekce]
 1. [konkretni problem s dopadem na konverze]
@@ -393,48 +317,83 @@ STREDNI PRIORITA: [nazev sekce]
 QUICK WINS: Rychle vyhry (do 1 tydne)
 1. [co jde udelat rychle a levne]
 
-Analyzuj tyto oblasti: homepage a prvni dojem, produktove stranky a fotografie, navigace a kategorie, kosik a checkout, trust signaly a recenze, mobilni verze, ceny a slevy, copywriting a mikrotexty.
+Analyzuj: homepage a prvni dojem, produktove stranky, navigaci, kosik a checkout, trust signaly, mobilni verzi, ceny, copywriting.`
 
-Pokud konkretni e-shop neznas, vychazej z obecne praxe v dane kategorii produktu a aplikuj znalostni bazi KRIS.`
+  const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 8000,
+      stream: true,
+      system: systemPrompt,
+      messages: [
+        {
+          role: 'user',
+          content: `Priprav kompletni KRIS CRO analyzu pro e-shop: ${clientName}
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 8000,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: `Priprav kompletni KRIS CRO analyzu pro e-shop: ${clientName}
+Bud konkretni - jmenuj konkretni prvky webu, konkretni cisla, konkretni kroky. Analyza musi byt primo pouzitelna jako akcni plan.`,
+        },
+      ],
+    }),
+  })
 
-Zamers se na nejcastejsi problemy v dane kategorii produktu. Bud konkretni - jmenuj konkretni prvky webu, konkretni cisla, konkretni kroky. Analyza musi byt primo pouzitelna jako akcni plan.`,
-          },
-        ],
-      }),
-    })
-
-    if (!response.ok) {
-      const err = await response.text()
-      return new Response(JSON.stringify({ success: false, error: 'Chyba API: ' + err }), {
-        headers: { 'Content-Type': 'application/json' }
-      })
-    }
-
-    const data = await response.json()
-    const analysis = data.content?.[0]?.text || ''
-
-    return new Response(JSON.stringify({ success: true, analysis }), {
-      headers: { 'Content-Type': 'application/json' }
-    })
-  } catch (e) {
-    return new Response(JSON.stringify({ success: false, error: e.message || 'Neznama chyba' }), {
+  if (!anthropicResponse.ok) {
+    const err = await anthropicResponse.text()
+    return new Response(JSON.stringify({ success: false, error: 'Chyba API: ' + err }), {
       headers: { 'Content-Type': 'application/json' }
     })
   }
+
+  // Stream SSE - drzi spojeni otevrene po celou dobu generovani
+  const encoder = new TextEncoder()
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = anthropicResponse.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop()
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6).trim()
+              if (data === '[DONE]') continue
+              try {
+                const parsed = JSON.parse(data)
+                if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+                  const chunk = `data: ${JSON.stringify({ text: parsed.delta.text })}\n\n`
+                  controller.enqueue(encoder.encode(chunk))
+                }
+                if (parsed.type === 'message_stop') {
+                  controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+                }
+              } catch {}
+            }
+          }
+        }
+      } finally {
+        controller.close()
+      }
+    }
+  })
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+    }
+  })
 }

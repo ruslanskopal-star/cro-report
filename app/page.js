@@ -116,6 +116,7 @@ export default function Home() {
   const [withClarity, setWithClarity] = useState(true)
   const [seconds, setSeconds] = useState(0)
   const [phaseIndex, setPhaseIndex] = useState(0)
+  const [elapsedSeconds, setElapsedSeconds] = useState(null)
   const timerRef = useRef(null)
   const phaseRef = useRef(null)
 
@@ -150,36 +151,95 @@ export default function Home() {
     setLoading(true)
     setError('')
     setAnalysis('')
+    setElapsedSeconds(null)
+    const startTime = Date.now()
+
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({clientName, withClarity})
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientName, withClarity })
       })
-      const data = await res.json()
-      if (data.success) {
+
+      if (!res.ok) {
+        const data = await res.json()
+        setError('Chyba: ' + (data.error || res.status))
+        setLoading(false)
+        return
+      }
+
+      const contentType = res.headers.get('content-type') || ''
+
+      // Streaming SSE mode
+      if (contentType.includes('text/event-stream')) {
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+        let accumulated = ''
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          buffer += decoder.decode(value, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop()
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6).trim()
+              if (data === '[DONE]') continue
+              try {
+                const parsed = JSON.parse(data)
+                if (parsed.text) accumulated += parsed.text
+              } catch {}
+            }
+          }
+        }
+
+        const elapsed = Math.round((Date.now() - startTime) / 1000)
+        setElapsedSeconds(elapsed)
         setDisplayName(clientName)
-        setAnalysis(data.analysis)
+        setAnalysis(accumulated)
         setClientName('')
       } else {
-        setError('Chyba: ' + data.error)
+        // Fallback JSON mode
+        const data = await res.json()
+        if (data.success) {
+          const elapsed = Math.round((Date.now() - startTime) / 1000)
+          setElapsedSeconds(elapsed)
+          setDisplayName(clientName)
+          setAnalysis(data.analysis)
+          setClientName('')
+        } else {
+          setError('Chyba: ' + data.error)
+        }
       }
-    } catch {
-      setError('Chyba spojeni')
+    } catch (e) {
+      setError('Chyba spojeni: ' + (e.message || 'neznama'))
     }
+
     setLoading(false)
   }
 
   return (
     <div style={{minHeight:'100vh',background:'#111',fontFamily:'Arial Black, Arial, sans-serif',padding:'20px'}}>
+      <style>{`
+        @media print {
+          body { background: white !important; }
+          .no-print { display: none !important; }
+          .print-area { background: white !important; color: black !important; border: none !important; }
+          .print-area * { color: black !important; }
+        }
+      `}</style>
       <div style={{maxWidth:'800px',margin:'0 auto',paddingTop:'40px'}}>
-        <div style={{textAlign:'center',marginBottom:'40px'}}>
+        <div style={{textAlign:'center',marginBottom:'40px'}} className="no-print">
           <Logo />
           <h1 style={{fontSize:'32px',fontWeight:'900',color:'white',margin:'0 0 6px 0',textTransform:'uppercase'}}>CRO Analyza</h1>
           <h2 style={{fontSize:'16px',fontWeight:'700',color:'#FF6B00',margin:'0',textTransform:'uppercase',letterSpacing:'3px'}}>Tržbě a marži Zdar!</h2>
         </div>
 
-        <div style={{background:'#1a1a1a',border:'2px solid #FF6B00',borderRadius:'16px',padding:'32px',marginBottom:'32px'}}>
+        <div style={{background:'#1a1a1a',border:'2px solid #FF6B00',borderRadius:'16px',padding:'32px',marginBottom:'32px'}} className="no-print">
           <p style={{color:'#888',fontSize:'14px',marginTop:'0',marginBottom:'20px',textAlign:'center',fontFamily:'Arial, sans-serif'}}>
             Zadej web klienta a AI agent KRIS vygeneruje CRO analýzu podle metodologie ESHOP BOOSTER
           </p>
@@ -188,7 +248,7 @@ export default function Home() {
             <input
               value={clientName}
               onChange={e => setClientName(e.target.value)}
-              placeholder="napr. Profi-DJ, Fanda-NHL.cz..."
+              placeholder="napr. denatura.cz, profi-dj.cz..."
               onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
               style={{flex:1,padding:'14px 18px',fontSize:'16px',background:'#111',border:'2px solid #333',borderRadius:'8px',color:'white',fontFamily:'Arial, sans-serif',outline:'none'}}
               onFocus={e => e.target.style.borderColor='#FF6B00'}
@@ -234,13 +294,27 @@ export default function Home() {
         </div>
 
         {analysis && (
-          <div style={{background:'#1a1a1a',border:'2px solid #333',borderRadius:'16px',padding:'32px'}}>
+          <div style={{background:'#1a1a1a',border:'2px solid #333',borderRadius:'16px',padding:'32px'}} className="print-area">
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'24px',paddingBottom:'16px',borderBottom:'2px solid #333'}}>
               <div>
                 <div style={{color:'#FF6B00',fontSize:'12px',fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',marginBottom:'4px'}}>CRO Analyza</div>
                 <div style={{color:'white',fontSize:'22px',fontWeight:'900'}}>{displayName}</div>
+                {elapsedSeconds && (
+                  <div style={{color:'#555',fontSize:'11px',fontFamily:'Arial, sans-serif',marginTop:'4px'}}>
+                    ⏱ Vygenerovano za {elapsedSeconds} sekund
+                  </div>
+                )}
               </div>
-              <div style={{background:'#FF6B00',borderRadius:'8px',padding:'8px 16px',fontSize:'12px',fontWeight:'700',color:'white',textTransform:'uppercase'}}>ESHOP BOOSTER</div>
+              <div style={{display:'flex',gap:'10px',alignItems:'center'}}>
+                <button
+                  onClick={() => window.print()}
+                  className="no-print"
+                  style={{background:'#222',border:'1px solid #444',borderRadius:'8px',padding:'8px 16px',fontSize:'12px',fontWeight:'700',color:'#aaa',cursor:'pointer',textTransform:'uppercase'}}
+                >
+                  ↓ Stáhnout PDF
+                </button>
+                <div style={{background:'#FF6B00',borderRadius:'8px',padding:'8px 16px',fontSize:'12px',fontWeight:'700',color:'white',textTransform:'uppercase'}}>ESHOP BOOSTER</div>
+              </div>
             </div>
             <div style={{fontFamily:'Arial, sans-serif',lineHeight:'1.7'}}>
               {analysis.split('\n').map((line, i) => {
@@ -273,7 +347,7 @@ export default function Home() {
           </div>
         )}
 
-        <p style={{textAlign:'center',color:'#333',fontSize:'12px',marginTop:'24px',fontFamily:'Arial, sans-serif'}}>
+        <p style={{textAlign:'center',color:'#333',fontSize:'12px',marginTop:'24px',fontFamily:'Arial, sans-serif'}} className="no-print">
           ESHOP BOOSTER 2026 - Ruslan Skopal
         </p>
       </div>
