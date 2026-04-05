@@ -79,7 +79,7 @@ export default function Home() {
 
         <div style={{ background: "#1a1a1a", border: "2px solid #FF6B00", borderRadius: "16px", padding: "32px", marginBottom: "32px" }}>
           <p style={{ color: "#888", fontSize: "14px", marginTop: "0", marginBottom: "20px", textAlign: "center", fontFamily: "Arial, sans-serif" }}>
-            Zadej jmeno klienta a AI vygeneruje CRO analyzu podle metodologie EshopBooster
+            Zadej jmeno klienta a AI vygeneruje CRO analyzu podle metodologie ESHOP BOOSTER
           </p>
           <div style={{ display: "flex", gap: "12px" }}>
             <input
@@ -117,7 +117,7 @@ export default function Home() {
                 <div style={{ color: "white", fontSize: "22px", fontWeight: "900" }}>{clientName}</div>
               </div>
               <div style={{ background: "#FF6B00", borderRadius: "8px", padding: "8px 16px", fontSize: "12px", fontWeight: "700", color: "white", textTransform: "uppercase" }}>
-                EshopBooster
+                ESHOP BOOSTER
               </div>
             </div>
             <div style={{ fontFamily: "Arial, sans-serif", lineHeight: "1.7" }}>
@@ -127,7 +127,7 @@ export default function Home() {
         )}
 
         <p style={{ textAlign: "center", color: "#333", fontSize: "12px", marginTop: "24px", fontFamily: "Arial, sans-serif" }}>
-          EshopBooster 2026 - Ruslan Skopal
+          ESHOP BOOSTER 2026 - Ruslan Skopal
         </p>
       </div>
     </div>
