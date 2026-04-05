@@ -2,21 +2,21 @@
 import { useState, useEffect, useRef } from 'react'
 
 const LOADING_PHASES = [
-  '🔍 Analyzuji první dojem a důvěryhodnost webu...',
-  '🖼️ Hodnotím kvalitu hero sekce a above-the-fold obsahu...',
+  '🔍 Analyzuji první dojem a důvěryhodnost...',
   '🛍️ Procházím produktové stránky a fotografie...',
-  '🧭 Kontroluji strukturu navigace a kategorií...',
-  '🔎 Testuju interní vyhledávání a filtrování...',
-  '🛒 Vyhodnocuji průběh košíku a checkout procesu...',
-  '🚚 Kontroluji možnosti dopravy a jejich zobrazení...',
-  '⭐ Hledám slabiny v trust signálech a recenzích...',
-  '📱 Simuluji chování uživatele na mobilním zařízení...',
-  '💰 Analyzuji cenotvorbu a psychologii cen...',
-  '✍️ Hodnotím copywriting, CTA tlačítka a mikrotexty...',
-  '🧠 Prohledávám znalostní bázi KRIS a ESHOP BOOSTER...',
-  '📊 Prioritizuji nálezy podle dopadu na konverze...',
-  '⚡ Identifikuji quick wins realizovatelné do 1 týdne...',
-  '🚀 Finalizuji CRO akční plán s konkrétními kroky...',
+  '🧭 Kontroluji navigaci, kategorie a mega menu...',
+  '🛒 Vyhodnocuji košík a checkout proces...',
+  '⭐ Hledám problémy s trust signály a recenzemi...',
+  '📱 Kontroluji mobilní verzi a dostupnost...',
+  '💰 Analyzuji cenotvorbu, AOV a multibuy...',
+  '✍️ Hodnotím copywriting a mikrotexty...',
+  '🔎 Prohledávám znalostní bázi KRIS v6...',
+  '🧠 Identifikuji Feature Factory pasti...',
+  '🎯 Hledám zombie funkce ke smazání...',
+  '📊 Generuji prioritizovaná doporučení...',
+  '⚡ Připravuji Quick Wins pro tento týden...',
+  '🐻 KRIS medvěd dokončuje analýzu...',
+  '🚀 Finalizuji CRO akční plán...',
 ]
 
 function Logo() {
@@ -86,40 +86,48 @@ function LoadingAnimation({ seconds, phase }) {
         fontFamily:'Arial, sans-serif',
         fontWeight:'600',
         letterSpacing:'0.3px',
-        animation:'fade-phase 4s ease-in-out infinite',
+        animation:'fade-phase 8s ease-in-out infinite',
       }}>
         {phase}
       </div>
       <div style={{marginTop:'10px',color:'#444',fontSize:'11px',fontFamily:'Arial, sans-serif'}}>
-        Analýza se zobrazuje průběžně jak AI píše...
+        Analýza trvá cca 60–90 sekund
       </div>
     </div>
   )
 }
 
 function AnalysisLine({ line }) {
+  const isKriticke = line.includes('KRITICKE') || line.includes('KRITICK')
+  const isVysoka = line.includes('VYSOKA')
+  const isStredni = line.includes('STREDNI')
+  const isQuick = line.includes('QUICK')
   const isH1 = line.startsWith('# ')
   const isH2 = line.startsWith('## ')
+  const isNum = /^\d+\./.test(line)
+  const isBullet = line.startsWith('- ')
+  const isEmpty = line.trim() === ''
+
   const displayLine = isH1 ? line.slice(2) : isH2 ? line.slice(3) : line
 
   const style =
-    line.includes('KRITICKE') || line.includes('KRITICK')
+    isKriticke
       ? {color:'#ff4444',fontWeight:'700',fontSize:'17px',marginTop:'24px',marginBottom:'8px',borderLeft:'4px solid #ff4444',paddingLeft:'12px'}
-    : line.includes('VYSOKA')
+    : isVysoka
       ? {color:'#FF6B00',fontWeight:'700',fontSize:'17px',marginTop:'24px',marginBottom:'8px',borderLeft:'4px solid #FF6B00',paddingLeft:'12px'}
-    : line.includes('STREDNI')
+    : isStredni
       ? {color:'#ffcc00',fontWeight:'700',fontSize:'17px',marginTop:'24px',marginBottom:'8px',borderLeft:'4px solid #ffcc00',paddingLeft:'12px'}
-    : line.includes('QUICK')
+    : isQuick
       ? {color:'#00ccff',fontWeight:'700',fontSize:'17px',marginTop:'24px',marginBottom:'8px',borderLeft:'4px solid #00ccff',paddingLeft:'12px'}
     : isH1
       ? {color:'white',fontWeight:'900',fontSize:'22px',marginTop:'28px',marginBottom:'10px'}
     : isH2
       ? {color:'#FF6B00',fontWeight:'700',fontSize:'15px',marginTop:'20px',marginBottom:'6px',textTransform:'uppercase',letterSpacing:'1px'}
-    : /^\d+\./.test(line)
+    : isNum
       ? {color:'#ddd',marginTop:'12px',paddingLeft:'8px'}
-    : line.startsWith('- ')
+    : isBullet
       ? {color:'#aaa',paddingLeft:'20px',marginTop:'4px',fontSize:'14px'}
-    : line.trim() === ''
+    : isEmpty
       ? {height:'4px'}
     : {color:'#ccc',marginTop:'6px',fontSize:'15px'}
 
@@ -136,40 +144,47 @@ export default function Home() {
   const [seconds, setSeconds] = useState(0)
   const [phaseIndex, setPhaseIndex] = useState(0)
   const timerRef = useRef(null)
-  const phaseRef = useRef(null)
-  const analysisRef = useRef(null)
+  const phaseTimeoutRef = useRef(null)
+  const analysisEndRef = useRef(null)
 
+  // Scroll to bottom as analysis streams in
+  useEffect(() => {
+    if (analysis && analysisEndRef.current) {
+      analysisEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [analysis])
+
+  // Timer
   useEffect(() => {
     if (loading) {
       setSeconds(0)
-      setPhaseIndex(0)
       timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000)
-
-      // Náhodný interval 6–12 sekund pro každou fázi
-      const scheduleNextPhase = () => {
-        const delay = (6 + Math.random() * 6) * 1000
-        phaseRef.current = setTimeout(() => {
-          setPhaseIndex(i => (i + 1) % LOADING_PHASES.length)
-          scheduleNextPhase()
-        }, delay)
-      }
-      scheduleNextPhase()
     } else {
       clearInterval(timerRef.current)
-      clearTimeout(phaseRef.current)
     }
-    return () => {
-      clearInterval(timerRef.current)
-      clearTimeout(phaseRef.current)
-    }
+    return () => clearInterval(timerRef.current)
   }, [loading])
 
-  // Auto-scroll na konec analýzy jak přibývá text
+  // Random phase timing 6–12s
   useEffect(() => {
-    if (analysis && analysisRef.current) {
-      analysisRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    if (!loading) {
+      clearTimeout(phaseTimeoutRef.current)
+      return
     }
-  }, [analysis])
+
+    function scheduleNextPhase() {
+      const delay = (6 + Math.random() * 6) * 1000 // 6–12s
+      phaseTimeoutRef.current = setTimeout(() => {
+        setPhaseIndex(i => (i + 1) % LOADING_PHASES.length)
+        scheduleNextPhase()
+      }, delay)
+    }
+
+    setPhaseIndex(0)
+    scheduleNextPhase()
+
+    return () => clearTimeout(phaseTimeoutRef.current)
+  }, [loading])
 
   async function handleAnalyze() {
     if (!clientName) return
@@ -186,13 +201,11 @@ export default function Home() {
       })
 
       if (!res.ok) {
-        const data = await res.json()
-        setError('Chyba: ' + (data.error || res.statusText))
+        setError('Chyba serveru: ' + res.status)
         setLoading(false)
         return
       }
 
-      // Čteme SSE stream průběžně
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
@@ -203,31 +216,35 @@ export default function Home() {
 
         buffer += decoder.decode(value, { stream: true })
         const lines = buffer.split('\n')
-
-        // Zpracujeme všechny kompletní řádky, poslední neúplný necháme v bufferu
         buffer = lines.pop() || ''
 
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue
           const data = line.slice(6).trim()
-          if (data === '[DONE]') continue
+          if (!data) continue
+          if (data === '[DONE]') {
+            setLoading(false)
+            setClientName('')
+            return
+          }
 
           try {
             const parsed = JSON.parse(data)
             if (parsed.error) {
-              setError('Chyba streamu: ' + parsed.error)
-            } else if (parsed.text) {
+              setError('Chyba: ' + parsed.error)
+              setLoading(false)
+              return
+            }
+            if (parsed.text) {
               setAnalysis(prev => prev + parsed.text)
             }
           } catch {
-            // Ignorujeme neúplné JSON fragmenty
+            // skip
           }
         }
       }
-
-      setClientName('')
     } catch (e) {
-      setError('Chyba spojení: ' + (e.message || 'Neznámá chyba'))
+      setError('Chyba spojení: ' + e.message)
     }
 
     setLoading(false)
@@ -252,23 +269,24 @@ export default function Home() {
               value={clientName}
               onChange={e => setClientName(e.target.value)}
               placeholder="napr. Profi-DJ, Fanda-NHL.cz..."
-              onKeyDown={e => e.key === 'Enter' && handleAnalyze()}
-              style={{flex:1,padding:'14px 18px',fontSize:'16px',background:'#111',border:'2px solid #333',borderRadius:'8px',color:'white',fontFamily:'Arial, sans-serif',outline:'none'}}
+              onKeyDown={e => e.key === 'Enter' && !loading && handleAnalyze()}
+              disabled={loading}
+              style={{flex:1,padding:'14px 18px',fontSize:'16px',background:'#111',border:'2px solid #333',borderRadius:'8px',color:'white',fontFamily:'Arial, sans-serif',outline:'none',opacity:loading?0.6:1}}
               onFocus={e => e.target.style.borderColor='#FF6B00'}
               onBlur={e => e.target.style.borderColor='#333'}
             />
             <button
               onClick={handleAnalyze}
               disabled={loading || !clientName}
-              style={{padding:'14px 28px',fontSize:'15px',fontWeight:'900',textTransform:'uppercase',background:loading||!clientName?'#333':'#FF6B00',color:loading||!clientName?'#666':'white',border:'none',borderRadius:'8px',cursor:loading||!clientName?'not-allowed':'pointer',whiteSpace:'nowrap'}}
+              style={{padding:'14px 28px',fontSize:'15px',fontWeight:'900',textTransform:'uppercase',background:loading||!clientName?'#333':'#FF6B00',color:loading||!clientName?'#666':'white',border:'none',borderRadius:'8px',cursor:loading||!clientName?'not-allowed':'pointer',whiteSpace:'nowrap',transition:'background 0.2s'}}
             >
               {loading ? 'Analyzuji...' : 'Spustit'}
             </button>
           </div>
 
           <div
-            onClick={() => setWithClarity(v => !v)}
-            style={{display:'flex',alignItems:'center',gap:'10px',cursor:'pointer',userSelect:'none',padding:'10px 14px',borderRadius:'8px',background: withClarity ? '#0d1f0d' : '#1a1a1a',border:`1px solid ${withClarity ? '#2a6b2a' : '#333'}`,transition:'all 0.2s'}}
+            onClick={() => !loading && setWithClarity(v => !v)}
+            style={{display:'flex',alignItems:'center',gap:'10px',cursor:loading?'not-allowed':'pointer',userSelect:'none',padding:'10px 14px',borderRadius:'8px',background: withClarity ? '#0d1f0d' : '#1a1a1a',border:`1px solid ${withClarity ? '#2a6b2a' : '#333'}`,transition:'all 0.2s',opacity:loading?0.7:1}}
           >
             <div style={{width:'18px',height:'18px',borderRadius:'4px',border:`2px solid ${withClarity ? '#4CAF50' : '#555'}`,background: withClarity ? '#4CAF50' : 'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all 0.2s'}}>
               {withClarity && (
@@ -282,7 +300,7 @@ export default function Home() {
                 {withClarity ? '✓ Mám přístup do Microsoft Clarity' : 'Nemám přístup do Microsoft Clarity'}
               </div>
               <div style={{color:'#555',fontSize:'11px',fontFamily:'Arial, sans-serif',marginTop:'2px'}}>
-                {withClarity ? 'Analýza bude zahrnovat heatmapy, nahrávky a chování uživatelů' : 'Analýza bude postavena na best practices bez dat z Clarity'}
+                {withClarity ? 'Analýza zahrne heatmapy, nahrávky a chování uživatelů' : 'Analýza bude postavena na best practices bez dat z Clarity'}
               </div>
             </div>
           </div>
@@ -303,22 +321,22 @@ export default function Home() {
                 <div style={{color:'#FF6B00',fontSize:'12px',fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',marginBottom:'4px'}}>CRO Analyza</div>
                 <div style={{color:'white',fontSize:'22px',fontWeight:'900'}}>{displayName}</div>
               </div>
-              <div style={{background:'#FF6B00',borderRadius:'8px',padding:'8px 16px',fontSize:'12px',fontWeight:'700',color:'white',textTransform:'uppercase'}}>ESHOP BOOSTER</div>
+              <div style={{background:'#FF6B00',borderRadius:'8px',padding:'8px 16px',fontSize:'12px',fontWeight:'700',color:'white',textTransform:'uppercase'}}>KRIS v6</div>
             </div>
-            <div style={{fontFamily:'Arial, sans-serif',lineHeight:'1.7'}} ref={analysisRef}>
+            <div style={{fontFamily:'Arial, sans-serif',lineHeight:'1.7'}}>
               {analysis.split('\n').map((line, i) => (
                 <AnalysisLine key={i} line={line} />
               ))}
-              {/* Blikající kurzor pokud stále streamujeme */}
               {loading && (
-                <span style={{display:'inline-block',width:'2px',height:'18px',background:'#FF6B00',marginLeft:'4px',animation:'pulse-ring 0.8s ease-in-out infinite',verticalAlign:'middle'}} />
+                <div style={{display:'inline-block',width:'10px',height:'18px',background:'#FF6B00',animation:'pulse-ring 0.8s ease-in-out infinite',marginLeft:'4px',verticalAlign:'middle'}} />
               )}
             </div>
+            <div ref={analysisEndRef} />
           </div>
         )}
 
         <p style={{textAlign:'center',color:'#333',fontSize:'12px',marginTop:'24px',fontFamily:'Arial, sans-serif'}}>
-          ESHOP BOOSTER 2026 - Ruslan Skopal
+          ESHOP BOOSTER 2026 – KRIS v6 – Ruslan Skopal
         </p>
       </div>
     </div>
