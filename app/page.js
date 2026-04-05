@@ -1,4 +1,5 @@
-// page_v9.js - sanitizace pomlcek z AI vystupu
+'use client'
+// page_v10.js - oprava use client directive
 import { useState, useEffect, useRef } from 'react'
 
 const LOADING_PHASES = [
