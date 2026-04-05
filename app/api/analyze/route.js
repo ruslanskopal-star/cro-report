@@ -1,10 +1,10 @@
-// route_v6_edge_v5.js
-// Zmeny oproti v4: URL input misto clientName, rozsirena Clarity sekce v knowledge base
+// route_v6_edge_v6.js
+// Zmeny oproti v5: KB prejmenovana na v6, NO VERSION FOOTER pravidlo v system promptu
 
 export const runtime = 'edge'
 
 const KRIS_KNOWLEDGE_BASE = `
-# KRIS ZNALOSTNI BAZE v5
+# KRIS ZNALOSTNI BAZE v6
 
 ## MICROSOFT CLARITY – JAK CIST DATA PRO CRO ANALYZU
 
@@ -185,7 +185,9 @@ TVOJE ULOHA: Analyzuj e-shop klienta na zaklade jeho URL a vytvor strukturovanou
 
 ${clarityInstruction}
 
-DULEZITE PRAVIDLO – NO DASH RULE: Ve svem vystupu NIKDY nepouzivej pomlcky (znak minus nebo pomlcku) jako oddelovace nebo dekoraci. Misto nich pouzivej dvojtecku, tecku nebo novy radek.
+DULEZITE PRAVIDLO 1 – NO DASH RULE: Ve svem vystupu NIKDY nepouzivej pomlcky (znak minus nebo pomlcku) jako oddelovace nebo dekoraci. Misto nich pouzivej dvojtecku, tecku nebo novy radek.
+
+DULEZITE PRAVIDLO 2 – NO VERSION FOOTER: Na konci analyzy NIKDY nepridavej radky s verzi, nazvem systemu ani zkratkami jako "KRIS v5", "KRIS analyza", "ESHOP BOOSTER metodologie v5" apod. Footer s autorstvim je reseny zvlast na urovni UI.
 
 POVINNÁ STRUKTURA ANALYZY (pouzivej presne tato klicova slova pro spravne zobrazeni):
 
