@@ -1,14 +1,11 @@
-// route_v6_edge_v13.js
-// Zmeny oproti v12:
-// 1. Zakaz slova "pravdepodobne" - nahradit "Toto jsem neoveril, doporucuji zkontrolovat"
-// 2. Max 6 stran zprisneno, Clarity max 2 vety, Quick Wins max 3 vety na polozku
-// 3. Matice standardni emoji: ✅ ❌ ⚠️ ❓
-// 4. Standardnich 8 oblasti skore s komentarem
-// 5. Celkovy potencial vzdy tabulka 2 sloupce
-// 6. KB: VideoObject schema, AR nabytek, progress bar doprava, "Pro koho se hodi"
-// 7. KB: Social proof badges, kategorie-specificke filtry, sport niche sekce
-// 8. KB: Email serie kategorie-specificke tipy, Heureka/Zbozi, niche vs masovy
-// 9. cleanUrl instrukce pro URL v hlavicce reportu
+// route_v6_edge_v23.js
+// Zmeny oproti v22:
+// 1. Clarity API realna data (numOfDays=3, mobile+desktop breakdown)
+// 2. Multi-page crawl: homepage + kosik + kategorie + detail produktu
+// 3. Dva rezimy: "quick" (top 10 priorit) a "full" (sekcni analyza po typech stranek)
+// 4. Tri vrstvy doporuceni: [CRO PRINCIP] + [SEGMENT] + [CLARITY DATA]
+// 5. Impact (1-5) vs Narocnost (1-5) matice ke kazdemu doporuceni
+// 6. Sekce 📱 MOBIL a 🖥️ DESKTOP zvlast v Clarity kontextu
 
 export const runtime = 'edge'
 
@@ -199,6 +196,247 @@ Prvky s nejvyssim dopadem (serazene):
 - Formulare: labely musi byt viditelne, ne jen placeholder
 `
 
+// Clarity Data Export API
+// Docs: https://learn.microsoft.com/en-us/clarity/clarity-data-export-api
+// Endpoint: GET https://www.clarity.ms/export-data/api/v1/project-live-insights
+// Auth: Bearer token (projekt-specificky JWT z Clarity Settings → Data Export)
+// Limit: max 10 requestu/projekt/den, data pouze za posledni 1-3 dny
+// Projekt je identifikovan tokenem, ne URL parametrem
+
+const CLARITY_API = 'https://www.clarity.ms/export-data/api/v1/project-live-insights'
+
+// Mapovani domeny na token: CLARITY_API_TOKEN_<DOMAIN_KEY>
+// Priklad: spinkids.sk → CLARITY_API_TOKEN_SPINKIDS_SK
+function getClarityToken(hostname) {
+  const key = hostname
+    .replace(/^www\./, '')
+    .replace(/[\.\-]/g, '_')
+    .toUpperCase()
+  return process.env[`CLARITY_API_TOKEN_${key}`] || null
+}
+
+async function fetchClarityData(hostname) {
+  try {
+    const token = getClarityToken(hostname)
+    if (!token) return null
+
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }
+
+    // 2 requesty: celkova data + breakdown podle zarizeni (mobile/desktop)
+    // numOfDays=3 = maximum dostupne (posledni 72 hodin)
+    const [overallRes, deviceRes] = await Promise.all([
+      fetch(`${CLARITY_API}?numOfDays=3`, { headers }),
+      fetch(`${CLARITY_API}?numOfDays=3&dimension1=Device`, { headers }),
+    ])
+
+    if (!overallRes.ok) {
+      const errText = await overallRes.text()
+      console.error(`Clarity API ${overallRes.status}:`, errText)
+      return null
+    }
+
+    const [overall, deviceBreakdown] = await Promise.all([
+      overallRes.json(),
+      deviceRes.ok ? deviceRes.json() : null,
+    ])
+
+    return { overall, deviceBreakdown }
+  } catch (e) {
+    console.error('fetchClarityData error:', e.message)
+    return null
+  }
+}
+
+// Parsovani Clarity response na citelny kontext pro Claude
+// Response format: [{ metricName: "Traffic", information: [{...}] }, ...]
+function parseClarityMetric(data, metricName) {
+  if (!Array.isArray(data)) return null
+  return data.find(m => m.metricName === metricName)?.information || null
+}
+
+function extractMetric(data, metricName) {
+  if (!Array.isArray(data)) return null
+  return data.find(m => m.metricName === metricName)?.information ?? null
+}
+
+function formatDeviceSection(deviceBreakdown, metricName, label) {
+  const rows = extractMetric(deviceBreakdown, metricName)
+  if (!rows) return ''
+  const lines = []
+  for (const row of rows) {
+    const dev = row.Device ?? row.device ?? 'Unknown'
+    if (metricName === 'Traffic') {
+      lines.push(`  ${dev}: sessions=${row.totalSessionCount ?? '?'}, uzivatele=${row.distantUserCount ?? '?'}, stranky/session=${Number(row.PagesPerSessionPercentage ?? 0).toFixed(2)}`)
+    } else {
+      const pct = row.sessionsWithMetricPercentage ?? row.percentage ?? '?'
+      lines.push(`  ${dev}: ${pct}% sessions postizeno`)
+    }
+  }
+  return lines.length ? `${label}:\n${lines.join('\n')}` : ''
+}
+
+function formatClarityContext(clarityData) {
+  if (!clarityData) return ''
+  const { overall, deviceBreakdown } = clarityData
+  const lines = ['\nREALNA DATA Z MICROSOFT CLARITY (posledni 3 dny):']
+
+  if (Array.isArray(overall)) {
+    for (const { metricName: name, information: info } of overall) {
+      if (!info?.length) continue
+      const r = info[0]
+      if (name === 'Traffic') {
+        lines.push(`- Celkem sessions: ${r.totalSessionCount ?? '?'} | Unikatni uzivatele: ${r.distantUserCount ?? '?'} | Stranky/session: ${Number(r.PagesPerSessionPercentage ?? 0).toFixed(2)}`)
+      } else if (name === 'RageClickCount' || name === 'Rage Click Count') {
+        lines.push(`- Rage clicks: ${r.sessionsWithMetricPercentage ?? '?'}% sessions (${r.sessionsCount ?? '?'} sessions, ${r.subTotal ?? '?'} kliknuti)`)
+      } else if (name === 'DeadClickCount' || name === 'Dead Click Count') {
+        lines.push(`- Dead clicks: ${r.sessionsWithMetricPercentage ?? '?'}% sessions (${r.sessionsCount ?? '?'} sessions, ${r.subTotal ?? '?'} kliknuti)`)
+      } else if (name === 'QuickbackClick' || name === 'Quickback Click') {
+        lines.push(`- Quick backs: ${r.sessionsWithMetricPercentage ?? '?'}% sessions`)
+      } else if (name === 'ScrollDepth' || name === 'Scroll Depth') {
+        lines.push(`- Scroll depth: ${r.sessionsWithMetricPercentage ?? '?'}% sessions scrolluje pod 50 %`)
+      } else if (name === 'EngagementTime' || name === 'Engagement Time') {
+        lines.push(`- Aktivni cas: ${r.subTotal ?? r.avgActiveTime ?? '?'}`)
+      } else if (name === 'ExcessiveScroll' || name === 'Excessive Scroll') {
+        lines.push(`- Excessive scroll: ${r.sessionsWithMetricPercentage ?? '?'}% sessions`)
+      }
+    }
+  }
+
+  if (Array.isArray(deviceBreakdown)) {
+    const trafficSection = formatDeviceSection(deviceBreakdown, 'Traffic', '📱🖥️ Breakdown podle zarizeni (Traffic)')
+    if (trafficSection) lines.push(trafficSection)
+    const rageSection = formatDeviceSection(deviceBreakdown, 'RageClickCount', '📱🖥️ Rage clicks podle zarizeni')
+      || formatDeviceSection(deviceBreakdown, 'Rage Click Count', '📱🖥️ Rage clicks podle zarizeni')
+    if (rageSection) lines.push(rageSection)
+    const deadSection = formatDeviceSection(deviceBreakdown, 'DeadClickCount', '📱🖥️ Dead clicks podle zarizeni')
+      || formatDeviceSection(deviceBreakdown, 'Dead Click Count', '📱🖥️ Dead clicks podle zarizeni')
+    if (deadSection) lines.push(deadSection)
+  }
+
+  lines.push('DULEZITE: Tato cisla jsou REALNA behavioralni data POUZE tohoto webu. Cituj je primo v analyze s konkretnimi hodnotami. Pokud mas mobilni data, Mobilni verze dostane skutecne skore, ne N/A.')
+  return lines.join('\n') + '\n'
+}
+
+async function fetchOnePage(url, timeoutMs = 8000) {
+  try {
+    const ctrl = new AbortController()
+    const t = setTimeout(() => ctrl.abort(), timeoutMs)
+    const res = await fetch(url, {
+      signal: ctrl.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CROBot/1.0)', 'Accept': 'text/html', 'Accept-Language': 'cs,sk,en;q=0.9' },
+    })
+    clearTimeout(t)
+    if (!res.ok) return null
+    return await res.text()
+  } catch { return null }
+}
+
+function extractLinks(html, baseUrl) {
+  const links = []
+  const re = /href=["']([^"'#?]+)["']/gi
+  let m
+  while ((m = re.exec(html)) !== null) {
+    try {
+      const u = new URL(m[1], baseUrl)
+      if (u.hostname === new URL(baseUrl).hostname) links.push(u.href)
+    } catch {}
+  }
+  return [...new Set(links)]
+}
+
+function parseMeta(html, url) {
+  if (!html) return null
+  const get = (re) => { const m = html.match(re); return m ? m[1].trim().replace(/\s+/g, ' ') : null }
+  return {
+    url,
+    title: get(/<title[^>]*>([^<]+)<\/title>/i) || get(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i),
+    description: get(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i) || get(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i),
+    h1: get(/<h1[^>]*>([^<]+)<\/h1>/i),
+    h2Count: (html.match(/<h2[^>]*>/gi) || []).length,
+    hasSchema: /application\/ld\+json/i.test(html),
+    hasVideo: /youtube\.com|vimeo\.com|<video/i.test(html),
+    hasBNPL: /twisto|splitit|alma|klarna|splitty/i.test(html),
+    hasSearch: /type=["']search["']|role=["']search["']/i.test(html),
+    hasReviews: /recenz|hodnocen|review|rating/i.test(html),
+    canonical: get(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i),
+    hasCouponField: /slevov|coupon|discount.*input|input.*coupon/i.test(html),
+    hasProgressBar: /progress.*doprv|zbývá.*doprv|free.*ship|doprava.*zdarma.*\d/i.test(html),
+  }
+}
+
+// Najde URL kategorie, detailu produktu a kosiku ze homepage HTML
+function discoverKeyUrls(html, baseUrl) {
+  const links = extractLinks(html, baseUrl)
+  const base = new URL(baseUrl).hostname
+  const score = (u) => {
+    const p = new URL(u).pathname.toLowerCase()
+    if (/kosik|cart|basket/.test(p)) return { type: 'kosik', url: u }
+    if (/checkout|objednavka|pokladna/.test(p)) return { type: 'checkout', url: u }
+    if (/produkt|product|detail|item/.test(p)) return { type: 'produkt', url: u }
+    if (/kategor|category|shop|zbozi/.test(p)) return { type: 'kategorie', url: u }
+    return null
+  }
+  const found = {}
+  for (const link of links) {
+    try {
+      const r = score(link)
+      if (r && !found[r.type]) found[r.type] = r.url
+    } catch {}
+  }
+  return found
+}
+
+async function fetchMultiPageData(clientUrl) {
+  const baseUrl = clientUrl.startsWith('http') ? clientUrl : `https://${clientUrl}`
+  const homepageHtml = await fetchOnePage(baseUrl, 10000)
+  const homepageMeta = parseMeta(homepageHtml, baseUrl)
+
+  if (!homepageHtml) return { homepage: null, pages: {} }
+
+  const keyUrls = discoverKeyUrls(homepageHtml, baseUrl)
+
+  // Paralelne fetch dalsi stranky (kosik, kategorie, produkt) — max 10s celkem
+  const extraPages = {}
+  const fetches = Object.entries(keyUrls).map(async ([type, url]) => {
+    const html = await fetchOnePage(url, 6000)
+    if (html) extraPages[type] = parseMeta(html, url)
+  })
+  await Promise.allSettled(fetches)
+
+  return { homepage: homepageMeta, pages: extraPages, discoveredUrls: keyUrls }
+}
+
+function formatMultiPageContext(crawlData) {
+  if (!crawlData?.homepage) return '\nMeta data se nepodarilo nacist. Analyzu postav na zaklade URL a kategorie.\n'
+  const { homepage: h, pages, discoveredUrls } = crawlData
+  let ctx = '\nREALNA DATA ZE STRANKY (pouzij v analyze):\n'
+  ctx += `Homepage:\n`
+  if (h.title) ctx += `- Title: "${h.title}"\n`
+  if (h.description) ctx += `- Meta description: "${h.description}"\n`
+  if (h.h1) ctx += `- H1: "${h.h1}"\n`
+  ctx += `- H2 pocet: ${h.h2Count} | Schema.org: ${h.hasSchema ? 'ANO' : 'NE'} | Video: ${h.hasVideo ? 'ANO' : 'NE'} | BNPL: ${h.hasBNPL ? 'ANO' : 'NE'} | Vyhledavani: ${h.hasSearch ? 'ANO' : 'NE'}\n`
+  if (h.canonical) ctx += `- Canonical: ${h.canonical}\n`
+
+  for (const [type, meta] of Object.entries(pages)) {
+    if (!meta) continue
+    ctx += `\n${type.charAt(0).toUpperCase() + type.slice(1)} (${meta.url}):\n`
+    if (meta.title) ctx += `- Title: "${meta.title}"\n`
+    if (meta.h1) ctx += `- H1: "${meta.h1}"\n`
+    if (type === 'kosik') {
+      ctx += `- Slevove pole viditelne: ${meta.hasCouponField ? 'ANO (problem — ceka zakazniky k odchodu)' : 'NE nebo skryte'}\n`
+      ctx += `- Progress bar doprava zdarma: ${meta.hasProgressBar ? 'ANO' : 'NE'}\n`
+    }
+    if (type === 'produkt') {
+      ctx += `- Recenze pritomny: ${meta.hasReviews ? 'ANO' : 'NE'} | Video: ${meta.hasVideo ? 'ANO' : 'NE'} | Schema: ${meta.hasSchema ? 'ANO' : 'NE'}\n`
+    }
+  }
+  ctx += `Komentuj: je title SEO-optimalizovany? H1 obsahuje keyword? Schema.org nasazena? BNPL zobrazeno?\n`
+  return ctx
+}
+
 async function fetchPageMeta(url) {
   try {
     const controller = new AbortController()
@@ -252,30 +490,27 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: 'API klic neni nastaven' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
     }
 
-    const pageMeta = await fetchPageMeta(clientUrl)
+    const hostname = clientUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+    const baseUrl = clientUrl.startsWith('http') ? clientUrl : `https://${clientUrl}`
 
-    let metaContext = ''
-    if (pageMeta) {
-      metaContext = `\nREALNA DATA ZE STRANKY (pouzij v analyze):\n`
-      if (pageMeta.title) metaContext += `- Title: "${pageMeta.title}"\n`
-      if (pageMeta.description) metaContext += `- Meta description: "${pageMeta.description}"\n`
-      if (pageMeta.h1) metaContext += `- H1: "${pageMeta.h1}"\n`
-      if (pageMeta.h2Count !== undefined) metaContext += `- Pocet H2: ${pageMeta.h2Count}\n`
-      if (pageMeta.hasSchema !== undefined) metaContext += `- Schema.org: ${pageMeta.hasSchema ? 'ANO - nasazena' : 'NE - chybi structured data'}\n`
-      if (pageMeta.canonical) metaContext += `- Canonical: ${pageMeta.canonical}\n`
-      metaContext += `Komentuj primo v analyze: je title SEO-optimalizovany? Meta description motivuje ke kliknuti? H1 obsahuje keyword? Schema.org nasazena?\n`
-    } else {
-      metaContext = `\nMeta data se nepodarilo nacist. Analyzu postav na zaklade URL a kategorie.\n`
-    }
+    const [crawlData, clarityData] = await Promise.all([
+      fetchMultiPageData(baseUrl),
+      fetchClarityData(hostname),
+    ])
 
-    const clarityInstruction = withClarity
-      ? `Klient MA Clarity. U kazde kriticke a vysoke priority uved jak ji overit v Clarity (max 1 veta).`
-      : `Klient NEMA Clarity. V sekci QUICK WINS uved Clarity jako bod 1 - max 2 vety s navodem na instalaci.`
+    const clarityDataContext = formatClarityContext(clarityData)
+    const metaContext = formatMultiPageContext(crawlData)
+
+    const clarityInstruction = clarityData
+      ? `Klient MA Clarity a MAME REALNA DATA (viz sekce REALNA DATA Z MICROSOFT CLARITY). Tato data patri POUZE tomuto webu — nikdy je nepouzivej pro jine projekty. Cituj konkretni hodnoty primo v analyze. Pokud mas mobilni data, Mobilni verze dostane skutecne skore 1-10, ne N/A.`
+      : withClarity
+        ? `Klient MA Clarity ale nemame API data pro tuto analyzu. U kazdeho doporuceni uved konkretni krok jak ho overit v Clarity (vrstva 📊 [CLARITY DATA]).`
+        : `Klient NEMA Clarity. V QUICK WINS jako prvni bod uved instalaci Clarity (max 2 vety: co to je + jak nainstalovat pres GTM).`
 
     const now = new Date()
     const dateStr = now.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })
 
-    const isTop10 = reportMode === 'top10'
+    const isTop10 = reportMode === 'top10' || reportMode === 'quick'
 
     const scoringAreas = `
 HODNOCENE OBLASTI A VAHY (pouzij vzdy presne tychto 7 oblasti + Mobilni verze jako N/A):
@@ -331,73 +566,80 @@ PRAVIDLO 9 – NO VERSION FOOTER: Na konci NIKDY nepridavej nazev systemu, verzi
 PRAVIDLO 10 – MAX 6 STRAN: Celkova delka analyzy MAXIMALNE 6 stran A4. Pokud bys presahl, zkrat: Quick Wins na max 3 vety, Stredni priority na 1-2 vety, Roadmap na jeden radek na polozku.
 `
 
+    const threeLayerFormat = `
+FORMAT TRI VRSTEV pro kazde doporuceni:
+🎯 [CRO PRINCIP]: obecny CRO princip proc tato zmena funguje (1 veta)
+👥 [SEGMENT]: zkusenosti z podobnych e-shopu v teto kategorii (1 veta s konkretnim dopadem)
+📊 [CLARITY DATA]: ${clarityData ? 'cituj konkretni hodnotu z realnych Clarity dat tohoto webu' : 'co by Clarity data ukazala — jak overit v Clarity (1 konkretni krok)'}
+
+IMPACT vs NAROCNOST pro kazde doporuceni:
+Dopad: [1-5 puntiku] | Narocnost: [1-5 puntiku] | Cas implementace: [odhad]
+(1 puntikem = nizky, 5 puntiku = vysoky)
+`
+
     const structureInstruction = isTop10 ? `
-REZIM: TOP 10 AKCNI PLAN
-Vygeneruj POUZE:
+REZIM: QUICK — TOP 10 PRIORITIZOVANYCH DOPORUCENI
+Vystup POUZE tyto sekce:
 
 SKORE E-SHOPU
-[Cislo 0-100 + kategorie + 1 veta komentar]
+[Cislo 0-100] (vazeny vypocet v zavorkach)
+[Kategorie + 1 veta komentar]
 
-TOP 10 AKCNICH KROKU (od nejvetsiho dopadu)
-1. [Max 8 slov nazev]
-   Proc: [1 veta]
-   Jak: [2 kroky max]
-   Dopad: [cislo nebo %]
+TOP 10 DOPORUCENI (razeno: nejvyssi Dopad / nejnizsi Narocnost = první)
+1. **[Nazev — max 8 slov]**
+   ${threeLayerFormat}
+   Dopad: ●●●●○ | Narocnost: ●●○○○ | Cas: [odhad]
 
-CELKOVY POTENCIAL
-Oblast | Odhadovany dopad
-[tabulka 3-5 radku]
+MATICE PRIORIT
+Doporuceni | Dopad (1-5) | Narocnost (1-5)
+[tabulka vsech 10]
 
-Celkova delka: 1 strana A4 max.
+Celkova delka: 1-2 strany A4.
 ` : `
-REZIM: PLNA ANALYZA
+REZIM: FULL — HLOUBKOVA SEKCNI ANALYZA
 
-KRITICKE: Vystup musi obsahovat PRESNE TYTO 4 SEKCE a nic jineho:
-1. SKORE E-SHOPU (s podskore oblasti)
-2. CO DELA DOBRE (3 body)
-3. TOP 5 QUICK WINS (kazdy s: Problem / Jak opravit / Odhadovany dopad / Jak overit v Clarity)
-4. CLARITY CHECKLIST (5 e-shop-specifickych polozek)
+ZAVAZNA STRUKTURA (presne tyto sekce, v tomto poradi):
 
-ZAKAZANE SEKCE: Nepridavej ROADMAP, IMPLEMENTACNI PLAN, TYDENNI PLAN, DUVERYHODNOSTNI MATICE, CELKOVY POTENCIAL ani zadnou 5. sekci. Vystup konci po CLARITY CHECKLIST.
-
----
-
-SKORE E-SHOPU
-[Cislo 0-100]
-[Kategorie e-shopu a konkurenti]
+## SKORE E-SHOPU
+[Cislo 0-100] (vazeny vypocet v zavorkach)
+[Kategorie + konkurenti]
 ${scoringAreas}
-[2 vety komentar]
 
-CO DELA DOBRE
-Tato sekce musi mit PRESNE 3 body. Kazdy bod musi:
-- Zacinat konkretnim nazvem prvku (napr. "Produktove fotografie", "Trust badge u kosiku", "Filtrovani kategorii")
-- Mit 2-3 vety: co konkretne existuje na webu + proc to funguje konverzne
-- Odkazovat na konkretni sekci nebo stranku e-shopu
-- ZAKAZANO: genericke chvaly jako "ma dobre produkty", "hezky design", "prehledny web" bez konkretniho dukazu
-- ZAKAZANO: body odvozene pouze z kategorie e-shopu bez primeho pozorovani (napr. "je na srovnavacich" nebo "ma siroke kategorie" bez konkretniho URL nebo prvku). Kazdy bod musi vychazet z konkretniho pozorovani z URL nebo meta dat. Pokud konkretni dukaz nemas, ten bod NEPIS a nahrad ho jinym kde dukaz existuje.
+## CO DELA DOBRE
+3 body — kazdy: konkretni nazev prvku + 2-3 vety proc funguje + odkaz na sekci/URL
 
-TOP 5 QUICK WINS (od nejvetsiho dopadu)
-Kazdy Quick Win musi mit PRESNE tuto strukturu:
-1. [Nazev]
-   **Problem:** [1 veta popisujici konkretni problem]
-   **Jak opravit:** [MAXIMALNE 3 kroky, kazdy krok max 2 vety, bez zbytecneho rozvadeni]
-   **Odhadovany dopad:** [konkretni % rozsah, napr. +8-15 % konverze]
-   **Jak overit v Clarity:** [1 konkretni instrukce: kde kliknout + co sledovat + jake cislo = problem potvrzen]
+## ANALYZA PO SEKCICH
 
-ZAKAZANO: vice nez 3 kroky v Jak opravit. Kazdy Quick Win musi byt implementovatelny za 1-2 hodiny, ne za tyden.
+### 🏠 HOMEPAGE A PRVNI DOJEM
+[3-4 konkretni pozorovani — co funguje, co chybi]
 
----
-## CLARITY CHECKLIST
+### 🔍 VYHLEDAVANI A NAVIGACE
+[filtrace, naseptavac, menu, "nic nenalezeno" stav]
 
-TATO SEKCE MUSI BYT VZDY POSLEDNI SEKCI ANALYZY. Prave 5 polozek, kazda specificka pro TENTO e-shop a jeho kategorii — NIKDY genericka. Format: "[cislo]. [Kde presne v Clarity kliknout] → [Co konkretne hledat a jak to interpretovat]"
-Priklad SPRAVNE polozky: "1. Heatmapa stranky /kosik → zkontroluj % uzivatelu kteri scrolluji pod seznam polozek; pokud mene nez 60 % vidi tlacitko Objednat, presun ho vys."
-Priklad SPATNE polozky: "1. Zkontroluj heatmapy webu." — TOTO JE ZAKAZANE.
+### 📦 KATEGORIE A VYPIS
+[fotografie, razeni, filtry, badges]
 
-1. [Kde v Clarity kliknout] → [Co konkretne hledat a jak to interpretovat]
-2. [Kde v Clarity kliknout] → [Co konkretne hledat a jak to interpretovat]
-3. [Kde v Clarity kliknout] → [Co konkretne hledat a jak to interpretovat]
-4. [Kde v Clarity kliknout] → [Co konkretne hledat a jak to interpretovat]
-5. [Kde v Clarity kliknout] → [Co konkretne hledat a jak to interpretovat]
+### 🛍️ DETAIL PRODUKTU
+[fotografie, video, "pro koho se hodi", recenze, BNPL, schema]
+
+### 🛒 KOSIK
+[slevove pole, progress bar, upsell, datum doruceni]
+
+### 💳 OBJEDNAVKOVY PROCES
+[kroky, platebni metody, BNPL, Apple/Google Pay]
+
+## TOP 5 QUICK WINS (od nejvetsiho dopadu × nejnizsi narocnosti)
+Kazdy Quick Win:
+**[Nazev]**
+${threeLayerFormat}
+**Problem:** [1 veta]
+**Jak opravit:** [max 3 kroky]
+**Odhadovany dopad:** [% rozsah]
+**Jak overit v Clarity:** [kde kliknout → co hledat → jake cislo = problem potvrzen]
+
+## CLARITY CHECKLIST (5 polozek, POSLEDNI SEKCE)
+Format: "[cislo]. [Kde v Clarity] → [Co hledat] → [Jak interpretovat]"
+Kazda polozka specificka pro TENTO web a kategorii.
 `
 
     const systemPrompt = `Jsi KRIS – Knowledge-based Report Intelligence System, expert CRO analytik e-shopu metodologie ESHOP BOOSTER.
@@ -406,7 +648,7 @@ Znalostni baze:
 ${KRIS_KNOWLEDGE_BASE}
 
 ${metaContext}
-
+${clarityDataContext}
 ${clarityInstruction}
 
 Dnesni datum: ${dateStr}.

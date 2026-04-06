@@ -7,9 +7,27 @@
 - Vercel Project ID: prj_c6U3B3yWLJn9130Cpb9U50f42uPC
 
 ## Aktuální stav
-- route.js = route_v6_edge_v21 (vážené skóre 15/20/10/20/15/10/10)
+- route.js = route_v6_edge_v23 (multi-page crawl, Clarity API, sekční analýza, dva módy)
 - page.js = page_v16
-- Další verze: route → v22, v23... | page → v17...
+- Další verze: route → v24 | page → v17...
+
+## Co je hotovo ve v23
+✅ Clarity API — reálná data (numOfDays=3, mobile+desktop breakdown)
+✅ Multi-page crawl — homepage + košík + kategorie + detail produktu paralelně
+✅ Dva módy: "quick" (top 10 priorit) a "full" (sekční analýza po typech stránek)
+✅ Sekční analýza: 🏠 Homepage / 🔍 Navigace / 📦 Kategorie / 🛍️ Detail / 🛒 Košík / 💳 Checkout
+✅ Knowledge base soubory: knowledge/sekce-*.md, knowledge/segmenty/, knowledge/reference-weby.md
+✅ Cron endpoint: /api/cron/daily-report (čeká na RESEND_API_KEY + KRIS_REPORT_EMAIL v env)
+✅ vercel.json: cron každý den v 8:00
+
+## Co zbývá — v24
+❌ Třívrstvý formát [CRO PRINCIP] / [SEGMENT] / [CLARITY DATA] — model ho nepoužívá, zpřísnit prompt
+❌ Impact/Náročnost matice (●●●●○) — model ho nepoužívá, zpřísnit prompt
+❌ Resend denní email — přidat RESEND_API_KEY + KRIS_REPORT_EMAIL do Vercel env
+❌ Doptávání — identifikace chybějícího kontextu (segment, obrat, hlavní problém)
+
+## Další krok
+v24: zpřísnit prompt pro třívrstvý formát a matici, test na spinkids.sk quick mód
 
 ## Jak testovat (BEZ BROWSERU)
 node scripts/kris-test.js davona.cz
