@@ -479,7 +479,7 @@ async function fetchPageMeta(url) {
 
 export async function POST(req) {
   try {
-    const { clientUrl, withClarity, reportMode } = await req.json()
+    const { clientUrl, withClarity, reportMode, shopContext } = await req.json()
 
     if (!clientUrl) {
       return new Response(JSON.stringify({ error: 'Chybi URL klienta' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
@@ -511,6 +511,10 @@ export async function POST(req) {
     const dateStr = now.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })
 
     const isTop10 = reportMode === 'top10' || reportMode === 'quick'
+
+    const shopContextBlock = (shopContext && (shopContext.segment || shopContext.obrat || shopContext.problem))
+      ? `\nKONTEXT KLIENTA (zadano pred analyzou — prispusobuj doporuceni tomuto profilu):\n${shopContext.segment ? `- Segment: ${shopContext.segment}` : ''}${shopContext.obrat ? `\n- Rocni obrat: ${shopContext.obrat}` : ''}${shopContext.problem ? `\n- Hlavni problem: ${shopContext.problem}` : ''}\nBench­marky a doporuceni kalibruj na tento segment a velikost. Hlavni problem zohledni jako prioritu pri razeni Quick Wins.\n`
+      : ''
 
     const scoringAreas = `
 HODNOCENE OBLASTI A VAHY (pouzij vzdy presne tychto 7 oblasti + Mobilni verze jako N/A):
@@ -662,7 +666,7 @@ Kazda polozka specificka pro TENTO web a kategorii.
 
 Znalostni baze:
 ${KRIS_KNOWLEDGE_BASE}
-
+${shopContextBlock}
 ${metaContext}
 ${clarityDataContext}
 ${clarityInstruction}

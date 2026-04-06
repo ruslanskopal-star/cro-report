@@ -332,6 +332,9 @@ export default function Home() {
   var [checks, setChecks] = useState({})
   var [currentAnalysisId, setCurrentAnalysisId] = useState(null)
   var [currentMode, setCurrentMode] = useState('full')
+  var [shopSegment, setShopSegment] = useState('')
+  var [shopObrat, setShopObrat] = useState('')
+  var [shopProblem, setShopProblem] = useState('')
   var timerRef = useRef(null)
   var phaseRef = useRef(null)
 
@@ -422,7 +425,7 @@ export default function Home() {
       var res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientUrl: fetchUrl, withClarity, reportMode }),
+        body: JSON.stringify({ clientUrl: fetchUrl, withClarity, reportMode, shopContext: { segment: shopSegment, obrat: shopObrat, problem: shopProblem } }),
       })
 
       if (!res.ok || !res.body) {
@@ -534,6 +537,25 @@ export default function Home() {
               </div>
               <div style={{color:withClarity?'#4CAF50':'#666',fontSize:'13px',fontWeight:'700',fontFamily:'Arial,sans-serif'}}>
                 {withClarity ? 'Mam pristup do Microsoft Clarity' : 'Nemam pristup do Microsoft Clarity'}
+              </div>
+            </div>
+
+            <div style={{marginTop:'16px',paddingTop:'16px',borderTop:'1px solid #222'}}>
+              <div style={{color:'#555',fontSize:'11px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',marginBottom:'10px',fontFamily:'Arial,sans-serif'}}>Kontext klienta (volitelne)</div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'8px'}}>
+                {[
+                  { val: shopSegment, set: setShopSegment, placeholder: 'Segment', opts: [['hracky','Hracky'],['moda','Moda a obleceni'],['kosmetika','Kosmetika'],['elektronika','Elektronika'],['nabytek','Nabytek a bydleni'],['sport','Sport a outdoor'],['potraviny','Potraviny'],['jine','Jine']] },
+                  { val: shopObrat, set: setShopObrat, placeholder: 'Rocni obrat', opts: [['do1m','Do 1M Kc'],['1-10m','1-10M Kc'],['10-50m','10-50M Kc'],['50m+','50M+ Kc']] },
+                  { val: shopProblem, set: setShopProblem, placeholder: 'Hlavni problem', opts: [['nizka-konverze','Nizka konverze'],['opusteny-kosik','Opusteny kosik'],['nizky-aov','Nizky prumer objednavky'],['bounce','Vysoky bounce rate'],['mobilni','Problemy na mobilu'],['jine','Jine']] },
+                ].map(function(sel, si) {
+                  return (
+                    <select key={si} value={sel.val} onChange={function(e) { sel.set(e.target.value) }}
+                      style={{padding:'9px 10px',fontSize:'12px',background:'#111',border:'1px solid ' + (sel.val ? '#FF6B00' : '#333'),borderRadius:'6px',color:sel.val ? '#FF6B00' : '#555',fontFamily:'Arial,sans-serif',outline:'none',cursor:'pointer'}}>
+                      <option value="">{sel.placeholder}</option>
+                      {sel.opts.map(function(o) { return <option key={o[0]} value={o[0]}>{o[1]}</option> })}
+                    </select>
+                  )
+                })}
               </div>
             </div>
 
