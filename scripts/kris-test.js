@@ -14,7 +14,7 @@ async function testKris(shopUrl) {
   const res = await fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ url: shopUrl, mode: 'full', hasClarityAccess: true })
+    body: JSON.stringify({ clientUrl: shopUrl, reportMode: 'full', withClarity: true })
   });
 
   if (!res.ok) { console.error('API error:', res.status, await res.text()); process.exit(1); }
@@ -34,13 +34,25 @@ async function testKris(shopUrl) {
   const elapsed = ((Date.now() - start) / 1000).toFixed(0);
   console.log(` hotovo za ${elapsed}s\n`);
 
+  // Parsuj SSE stream na čistý text
+  let parsedText = '';
+  for (const line of fullText.split('\n')) {
+    if (!line.startsWith('data: ')) continue;
+    const data = line.slice(6).trim();
+    if (data === '[DONE]') continue;
+    try {
+      const parsed = JSON.parse(data);
+      if (parsed.chunk) parsedText += parsed.chunk;
+    } catch {}
+  }
+
   // Výpis analýzy
   console.log('─'.repeat(60));
-  console.log(fullText);
+  console.log(parsedText);
   console.log('─'.repeat(60));
 
   // Hodnocení kritérií
-  const t = fullText;
+  const t = parsedText;
   const tl = t.toLowerCase();
   const results = [
     { nazev: '4 sekce (SKÓRE/CO DĚLÁ DOBŘE/QUICK WINS/CLARITY CHECKLIST)', ok: t.includes('SKORE') || t.includes('SKÓRE') },
@@ -50,7 +62,7 @@ async function testKris(shopUrl) {
     { nazev: 'Žádný ROADMAP/IMPLEMENTACE', ok: !t.includes('ROADMAP') && !t.includes('IMPLEMENTACE') },
     { nazev: 'Žádné zakázané fráze', ok: !t.includes('neověřil jsem') && !t.includes('nebylo možné ověřit') && !t.includes('nelze ověřit z dostupných dat') },
     { nazev: 'Mobilní = N/A', ok: t.includes('N/A') },
-    { nazev: 'Vážené skóre (výpočet v závorce)', ok: /\d+×\d+/.test(t) || t.includes('×') },
+    { nazev: 'Vážené skóre (výpočet v závorce)', ok: /\d+[x×]\d+/.test(t) },
     { nazev: 'CO DĚLÁ DOBŘE = přesně 3 body', ok: (t.match(/\*\*\d+\./g) || []).length >= 3 },
     { nazev: 'Quick Wins: Odhadovaný dopad (5×)', ok: (tl.match(/odhadovan/g) || []).length >= 5 },
     { nazev: 'Quick Wins: Jak ověřit v Clarity (5×)', ok: (tl.match(/jak ov[eě]řit|jak overit/g) || []).length >= 5 },
