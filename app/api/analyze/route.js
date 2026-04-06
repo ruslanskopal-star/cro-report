@@ -296,6 +296,7 @@ VYPOCET CELKOVEHO SKORE: Celkove skore MUSI byt vypocitano jako vazeny prumer 7 
 Vzorec: (skore1 x 15) + (skore2 x 20) + (skore3 x 10) + (skore4 x 20) + (skore5 x 15) + (skore6 x 10) + (skore7 x 10) = celkove skore ze 100.
 Za celkovym skorem uved vypocet v zavorkach, napr.: (4x15 + 6x20 + 5x10 + 4x20 + 5x15 + 5x10 + 4x10 = 490 → 49/100)
 ZAKAZANO: Celkove skore odhadnout bez vypoctu z podskore.
+ZAKAZANO: Celkove skore a vypocet opakovat — uved ho POUZE JEDNOU, bezprostredne pod nadpisem SKORE E-SHOPU. Pod tabulkou oblasti NEPRIDAVEJ zadny souhrn ani opakovani vypoctu.
 
 Pozor: Skore musi byt relativni vuci kategorii a velikosti e-shopu.
 Niche specializovany e-shop hodnoť vyse za autenticky obsah a odbornost.
@@ -370,6 +371,7 @@ Tato sekce musi mit PRESNE 3 body. Kazdy bod musi:
 - Mit 2-3 vety: co konkretne existuje na webu + proc to funguje konverzne
 - Odkazovat na konkretni sekci nebo stranku e-shopu
 - ZAKAZANO: genericke chvaly jako "ma dobre produkty", "hezky design", "prehledny web" bez konkretniho dukazu
+- ZAKAZANO: body odvozene pouze z kategorie e-shopu bez primeho pozorovani (napr. "je na srovnavacich" nebo "ma siroke kategorie" bez konkretniho URL nebo prvku). Kazdy bod musi vychazet z konkretniho pozorovani z URL nebo meta dat. Pokud konkretni dukaz nemas, ten bod NEPIS a nahrad ho jinym kde dukaz existuje.
 
 TOP 5 QUICK WINS (od nejvetsiho dopadu)
 Kazdy Quick Win musi mit PRESNE tuto strukturu:
