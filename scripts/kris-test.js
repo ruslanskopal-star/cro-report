@@ -8,8 +8,28 @@ if (!url) { console.error('Použití: node scripts/kris-test.js <url-eshopu>'); 
 
 const API = 'https://cro-report.vercel.app/api/analyze';
 
+async function checkClarity(shopUrl) {
+  try {
+    const fullUrl = shopUrl.startsWith('http') ? shopUrl : `https://${shopUrl}`;
+    const res = await fetch(fullUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; CROBot/1.0)' },
+      signal: AbortSignal.timeout(8000),
+    });
+    const html = await res.text();
+    return html.includes('clarity.ms');
+  } catch {
+    return false;
+  }
+}
+
 async function testKris(shopUrl) {
   console.log(`\n🔍 Testuji: ${shopUrl}\n`);
+
+  const hasClarity = await checkClarity(shopUrl);
+  if (!hasClarity) {
+    console.log(`⚠️  Clarity tracking nenalezen — doporučení jsou založena na expertní analýze webu, ne na behaviorálních datech\n`);
+  }
+
   const start = Date.now();
 
   const controller = new AbortController();
