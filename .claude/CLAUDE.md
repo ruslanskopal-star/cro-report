@@ -35,61 +35,35 @@ node scripts/kris-test.js davona.cz
 1. Důvěryhodnost 15% | 2. Produktové stránky 20% | 3. Navigace 10%
 4. Objednávkový proces 20% | 5. Homepage 15% | 6. SEO 10% | 7. Zákaznická péče 10%
 
+## CLARITY PROJEKTY
+Weby s aktivním Clarity trackingem (Project ID doplnit ručně):
+- davona.cz | Project ID: —
+- eppi.cz, eppi.de, sperky-a-diamanty.sk | Project ID: —
+- fanda-nhl.cz, fanda-nhl.sk | Project ID: —
+- profi-dj.cz | Project ID: —
+- spinkids.cz, spinkids.de, spinkids.gr, spinkids.hr, spinkids.hu, spinkids.it, spinkids.pl, spinkids.ro, spinkids.si, spinkids.sk | Project ID: —
+
 ## Zásobník e-shopů (nepoužité)
-vonavydomov.eu
-mojeromantika.cz
-farmamix.sk
-garazujeme.cz
-sana-store.cz
-utrhni.cz
-levelys.sk
-lepsizivot.shop
-cestouprirody.eu
-inzep.cz
-pyzamka.cz
-deeplove.cz
-silluro.cz
-olashop.cz
-cyklodiskont.cz
-marieli.cz
-momenti.cz
-sparkys.cz
-bonfood.cz
-vicnezkucharka.cz
-salveo.cz
-malinna.com
-witsocks.cz
-fixy.cz
-eurokoberce.eu
-zelenazeme.cz
-vercajk-shop.cz
-smatab.cz
-horakgastro.com
-leoness.sk
-lovesilk.sk
-just.love
-pranita.cz
-instalshop.sk
-kraloveskoly.cz
-katea.sk
-represhop.eu
-drdlik.cz
-spime.cz
-papery.cz
-slickstyle.cz
-kavatrobica.cz
-mixton.cz
-simply-beauty.eu
-husse.cz
-luxelleparis.com
-lyss.cz
-dapi.cz
-drogeriadomov.sk
-facederma.sk
+davona.cz
+eppi.cz
+eppi.de
+sperky-a-diamanty.sk
+fanda-nhl.cz
+fanda-nhl.sk
+profi-dj.cz
+spinkids.cz
+spinkids.de
+spinkids.gr
+spinkids.hr
+spinkids.hu
+spinkids.it
+spinkids.pl
+spinkids.ro
+spinkids.si
+spinkids.sk
 
 ## Použité e-shopy
-cubenest.cz (v16, 64/100) | haltimo.com (v16, 52/100) | elenys.cz (v17, 62/100)
-zahradnizabava.cz (v18, 58/100) | vikio.cz (v19, 41/100) | davona.cz (v20, 51/100) | v-mart.cz (v21, ?)
+davona.cz (v20, 51/100) | v-mart.cz (v21, 54/100)
 
 ## Zakázané v route.js
 - ROADMAP, IMPLEMENTAČNÍ PLÁN, TÝDENNÍ PLÁN jako extra sekce
