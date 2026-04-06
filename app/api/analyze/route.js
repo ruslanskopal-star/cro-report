@@ -288,7 +288,9 @@ OSMI STANDARDNICH OBLASTI SKORE (pouzij vzdy tychto 8, poradi muze zmenit dle pr
 7. Cenotvorba a konverzni prvky
 8. Copywriting a texty
 
-Format pro kazdou oblast: "Oblast: X/10 | Komentar: [1 veta co konkretne chybi nebo funguje]"
+Format pro kazdou oblast: "Oblast: X/10"
+**Komentar:** [1 veta: konkretni problem nebo silna stranka ktera skore zpusobuje] + [1 veta: konkretni priklad z tohoto e-shopu — nazev prvku, URL, nebo pozorovani]
+ZAKAZANO: Komentare jako "Tato oblast je prumerna" nebo "Web ma prostor pro zlepseni" bez konkretniho prikladu. Kazdy komentar musi byt tak specificky, ze nemuze platit pro jiny e-shop.
 Pozor: Skore musi byt relativni vuci kategorii a velikosti e-shopu.
 Niche specializovany e-shop hodnoť vyse za autenticky obsah a odbornost.
 
