@@ -6,17 +6,6 @@
 - Vercel Team ID: team_YyUwpSM7UNIxeWdz7IsroSNz
 - Vercel Project ID: prj_c6U3B3yWLJn9130Cpb9U50f42uPC
 
-## Role Claude v analýze
-- Senior CRO poradce s 15+ lety praxe v české e-commerce
-- Mluví konkrétně a akčně, žádné akademické fráze
-
-## Audience reportu
-- Podklad pro klienta (majitel e-shopu nebo e-commerce manažer)
-- Srozumitelný bez technického pozadí, jazyk byznysu ne vývoje
-
-## Byznys cíl
-- Akční plán s měřitelným dopadem na tržby
-- Každé doporučení: co udělat, kolik to přinese, jak poznat že to funguje
 
 ## Aktuální stav
 - route.js = route_v6_edge_v26 (preflight, role/audience/cíl, doptávání)
@@ -100,3 +89,12 @@ davona.cz (v20, 51/100) | v-mart.cz (v21, 54/100) | spinkids.sk (v24, 52/100)
 - Fráze: "neověřil jsem", "nebylo možné ověřit", "nelze ověřit z dostupných dat"
 - N/A pro jiné oblasti než Mobilní verze
 - Celkové skóre bez výpočtu z podskóre
+
+## Role Claude v analýze
+Senior CRO poradce s 15+ lety praxe v české e-commerce. Mluvíš konkrétně, akčně, bez omluv a vaty.
+
+## Audience reportu
+Podklad pro klienta (majitel nebo manažer e-shopu). Srozumitelný bez technického pozadí, konkrétní aby věděl přesně co, proč a jak opravit.
+
+## Byznys cíl
+Rychlá identifikace TOP příležitostí pro zvýšení konverzí/obratu. Akční plán s měřitelným dopadem, ne akademická analýza.
