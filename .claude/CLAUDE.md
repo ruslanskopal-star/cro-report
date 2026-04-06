@@ -13,15 +13,21 @@
 
 ## Co je hotovo ve v25
 ✅ Vercel env vars: RESEND_API_KEY + KRIS_REPORT_EMAIL + CRON_SECRET + ANTHROPIC_API_KEY přidány
-✅ Cron endpoint /api/cron/daily-report — 401 bez tokenu ✓, test s tokenem čeká na potvrzení
+✅ Cron endpoint /api/cron/daily-report — {"ok":true} ✓, email doručen
 ✅ vercel.json: cron každý den v 8:00 UTC aktivní
 
-## Co zbývá — v26
-❌ Doptávání — identifikace chybějícího kontextu (segment, obrat, hlavní problém) před analýzou
-❌ Potvrdit cron test (spustit s CRON_SECRET a ověřit {"ok":true})
+## Co je hotovo ve v26
+✅ Doptávání — 3 volitelné selecty v UI (segment, roční obrat, hlavní problém)
+✅ shopContext injektován do system promptu — benchmarky a Quick Wins kalibrovány dle profilu
+✅ Selecty se zvýrazní oranžově když jsou vyplněny
+
+## Co zbývá — v27
+❌ Test v26 na davona.cz nebo eppi.cz s vyplněným kontextem
+❌ Knowledge base segmenty — vyplnit kosmetika.md, moda.md, elektronika.md
+❌ Segment-specifické benchmarky v promptu (dle vybraného segmentu)
 
 ## Další krok
-v26: implementovat doptávání — pre-flight dialog před analýzou pro zjištění segmentu, obratu, hlavního problému
+v27: test doptávání na reálném e-shopu, pak vyplnit knowledge base pro top 3 segmenty
 
 ## Jak testovat (BEZ BROWSERU)
 node scripts/kris-test.js davona.cz
