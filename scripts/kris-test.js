@@ -1,5 +1,5 @@
-// @claude timeout=300
 #!/usr/bin/env node
+// @claude timeout=300
 // KRIS iterační tester — volá live API přímo, bez browseru
 // Použití: node scripts/kris-test.js davona.cz
 
