@@ -5,7 +5,8 @@
 // 3. shopContext (segment, obrat, problem) injektovan do promptu
 // 4. Tri vrstvy + matice dopad/narocnost (z v24)
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
+export const maxDuration = 300
 
 const KRIS_KNOWLEDGE_BASE = `
 # KRIS ZNALOSTNI BAZE v9
