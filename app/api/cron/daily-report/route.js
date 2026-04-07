@@ -31,7 +31,7 @@ export async function GET(req) {
     <p><em>Žádné nové konflikty.</em></p>
     <h3>🔄 Stav systému</h3>
     <ul>
-      <li>route.js: route_v6_edge_v24</li>
+      <li>route.js: route_v6_edge_v26</li>
       <li>Clarity API: aktivní</li>
       <li>Vercel: online</li>
     </ul>
