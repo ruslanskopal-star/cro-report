@@ -532,7 +532,7 @@ export async function POST(req) {
       return new Response(JSON.stringify({
         detectedCategory: null,
         questions: [
-          { id: 'segment', label: 'V jakem segmentu pusobite?', options: ['hracky','moda','kosmetika','elektronika','nabytek','sport','potraviny','jine'] },
+          { id: 'segment', label: 'V jakem segmentu pusobite?', options: ['hracky','moda','kosmetika','elektronika','nabytek','sport','potraviny','sperky-zlatnictvi','jine'] },
           { id: 'obrat', label: 'Jaky je vas rocni obrat?', options: ['do1m','1-10m','10-50m','50m+'] },
           { id: 'problem', label: 'Co vas nejvic trapi?', options: ['nizka-konverze','opusteny-kosik','nizky-aov','bounce','mobilni','jine'] },
         ],
