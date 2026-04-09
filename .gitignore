@@ -2,3 +2,9 @@ node_modules
 .next
 .env
 .env.local
+.env*.local
+.vercel
+*.log
+*.pem
+credentials.json
+.DS_Store

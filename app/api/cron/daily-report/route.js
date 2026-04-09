@@ -53,8 +53,8 @@ export async function GET(req) {
 
   if (!res.ok) {
     const err = await res.text()
-    console.error('Resend error:', err)
-    return new Response(JSON.stringify({ error: err }), { status: 500 })
+    console.error('[CRON] Resend error:', err)
+    return new Response(JSON.stringify({ error: 'Chyba pri odesilani emailu' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 
   return new Response(JSON.stringify({ ok: true, sent: today }))

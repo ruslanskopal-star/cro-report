@@ -832,6 +832,7 @@ Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY 
       headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' },
     })
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message || 'Neznama chyba' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    console.error('[ANALYZE] Error:', e.message)
+    return new Response(JSON.stringify({ error: 'Chyba pri analyze' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }

@@ -44,8 +44,8 @@ export async function POST(req) {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (e) {
-    console.error('Report save error:', e.message)
-    return new Response(JSON.stringify({ error: e.message }), { status: 500 })
+    console.error('[REPORTS] Save error:', e.message)
+    return new Response(JSON.stringify({ error: 'Chyba pri ukladani reportu' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
 
@@ -86,8 +86,8 @@ export async function GET(req) {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (e) {
-    console.error('Report list error:', e.message)
-    return new Response(JSON.stringify({ error: e.message }), { status: 500 })
+    console.error('[REPORTS] List error:', e.message)
+    return new Response(JSON.stringify({ error: 'Chyba pri nacitani reportu' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
 
@@ -109,7 +109,7 @@ export async function DELETE(req) {
     await del(blobUrl)
     return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } })
   } catch (e) {
-    console.error('Report delete error:', e.message)
-    return new Response(JSON.stringify({ error: e.message }), { status: 500 })
+    console.error('[REPORTS] Delete error:', e.message)
+    return new Response(JSON.stringify({ error: 'Chyba pri mazani reportu' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }

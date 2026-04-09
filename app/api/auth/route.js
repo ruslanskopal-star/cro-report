@@ -35,6 +35,7 @@ export async function POST(req) {
     const sessionToken = createSessionToken()
     return new Response(JSON.stringify({ ok: true, token: sessionToken }), { headers: { 'Content-Type': 'application/json' } })
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    console.error('[AUTH] Error:', e.message)
+    return new Response(JSON.stringify({ error: 'Chyba serveru' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
