@@ -388,7 +388,7 @@ export default function Home() {
         var saveRes = await fetch('/api/reports', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: url, analysis: clean, withClarity: withClarity, seconds: elapsed }),
+          body: JSON.stringify({ url: url, analysis: clean, withClarity: withClarity, seconds: elapsed, authToken: authToken }),
         })
         if (!saveRes.ok) console.error('Blob save failed:', saveRes.status)
         else console.log('Report ulozen do Blob')

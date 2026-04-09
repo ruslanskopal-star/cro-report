@@ -6,6 +6,7 @@
 // 4. Tri vrstvy + matice dopad/narocnost (z v24)
 
 import { put } from '@vercel/blob'
+import { verifySessionToken } from '../../lib/auth.js'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -489,19 +490,8 @@ export async function POST(req) {
 
     // Overeni session tokenu (krome preflight)
     if (action !== 'preflight') {
-      const secret = process.env.TOTP_SECRET
-      if (!authToken || !secret) {
-        return new Response(JSON.stringify({ error: 'Neautorizovany pristup' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
-      }
-      try {
-        const decoded = Buffer.from(authToken, 'base64').toString()
-        const [tokenSecret, timestamp] = decoded.split(':')
-        const age = Date.now() - parseInt(timestamp)
-        if (tokenSecret !== secret || age > 24 * 60 * 60 * 1000) {
-          return new Response(JSON.stringify({ error: 'Session vyprsela, zadej kod znovu' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
-        }
-      } catch {
-        return new Response(JSON.stringify({ error: 'Neplatny token' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
+      if (!verifySessionToken(authToken)) {
+        return new Response(JSON.stringify({ error: 'Neautorizovany pristup — zadej kod znovu' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
       }
     }
 

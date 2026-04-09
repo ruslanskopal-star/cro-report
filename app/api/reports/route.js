@@ -1,12 +1,18 @@
 // API pro ukládání a čtení CRO reportů (Vercel Blob storage)
-import { put, list } from '@vercel/blob'
+import { put, list, del } from '@vercel/blob'
+import { verifySessionToken } from '../../lib/auth.js'
 
 export const runtime = 'nodejs'
 
 // POST — uloží nový report
 export async function POST(req) {
   try {
-    const { url, analysis, mode, score, withClarity, seconds } = await req.json()
+    const { url, analysis, mode, score, withClarity, seconds, authToken } = await req.json()
+
+    if (!verifySessionToken(authToken)) {
+      return new Response(JSON.stringify({ error: 'Neautorizovany pristup' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
+    }
+
     if (!url || !analysis) {
       return new Response(JSON.stringify({ error: 'Chybí url nebo analysis' }), { status: 400 })
     }
@@ -44,13 +50,19 @@ export async function POST(req) {
 // GET — seznam reportů (volitelně ?hostname=eppi.cz)
 export async function GET(req) {
   try {
+    // Auth z query stringu nebo headeru
     const { searchParams } = new URL(req.url)
+    const authToken = searchParams.get('token') || req.headers.get('authorization')?.replace('Bearer ', '')
+
+    if (!verifySessionToken(authToken)) {
+      return new Response(JSON.stringify({ error: 'Neautorizovany pristup' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
+    }
+
     const hostname = searchParams.get('hostname')
     const prefix = hostname ? `reports/${hostname}/` : 'reports/'
 
     const { blobs } = await list({ prefix })
 
-    // Načti obsah každého blobu (max 50 posledních)
     const sorted = blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)).slice(0, 50)
 
     const reports = await Promise.all(
@@ -69,6 +81,29 @@ export async function GET(req) {
     })
   } catch (e) {
     console.error('Report list error:', e.message)
+    return new Response(JSON.stringify({ error: e.message }), { status: 500 })
+  }
+}
+
+// DELETE — smazání reportu
+export async function DELETE(req) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const authToken = searchParams.get('token') || req.headers.get('authorization')?.replace('Bearer ', '')
+
+    if (!verifySessionToken(authToken)) {
+      return new Response(JSON.stringify({ error: 'Neautorizovany pristup' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
+    }
+
+    const blobUrl = searchParams.get('blobUrl')
+    if (!blobUrl) {
+      return new Response(JSON.stringify({ error: 'Chybi blobUrl' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
+    }
+
+    await del(blobUrl)
+    return new Response(JSON.stringify({ ok: true }), { headers: { 'Content-Type': 'application/json' } })
+  } catch (e) {
+    console.error('Report delete error:', e.message)
     return new Response(JSON.stringify({ error: e.message }), { status: 500 })
   }
 }

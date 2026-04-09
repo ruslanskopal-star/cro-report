@@ -1,9 +1,16 @@
 import { TOTP, Secret } from 'otpauth'
+import { createSessionToken, checkRateLimit } from '../../lib/auth.js'
 
 export const runtime = 'nodejs'
 
 export async function POST(req) {
   try {
+    // Rate limit per IP
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    if (!checkRateLimit(ip)) {
+      return new Response(JSON.stringify({ error: 'Prilis mnoho pokusu, zkuste za 15 minut' }), { status: 429, headers: { 'Content-Type': 'application/json' } })
+    }
+
     const { code } = await req.json()
     if (!code) {
       return new Response(JSON.stringify({ error: 'Chybi kod' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
@@ -21,8 +28,7 @@ export async function POST(req) {
       return new Response(JSON.stringify({ ok: false, error: 'Neplatny kod' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
     }
 
-    // Vygeneruj session token (platny 24h)
-    const sessionToken = Buffer.from(secret + ':' + Date.now()).toString('base64')
+    const sessionToken = createSessionToken()
     return new Response(JSON.stringify({ ok: true, token: sessionToken }), { headers: { 'Content-Type': 'application/json' } })
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
