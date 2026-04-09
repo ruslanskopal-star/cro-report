@@ -515,6 +515,13 @@ export default function Home() {
       setClientUrl('')
       var newId = saveToHistory(fetchUrl, clean, elapsed, reportMode, withClarity)
       setCurrentAnalysisId(newId)
+      // Ulož report na server (Vercel Blob)
+      var scoreMatch = clean.match(/(\d{2})\/100/)
+      fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: fetchUrl, analysis: clean, mode: reportMode, score: scoreMatch ? parseInt(scoreMatch[1], 10) : null, withClarity: withClarity, seconds: elapsed }),
+      }).catch(function() {})
     } catch(e) {
       setError('Chyba spojeni: ' + e.message)
     }
