@@ -9,12 +9,12 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: 'Chybi kod' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
     }
 
-    const secret = process.env.TOTP_SECRET
+    const secret = (process.env.TOTP_SECRET || '').trim()
     if (!secret) {
       return new Response(JSON.stringify({ error: 'TOTP neni nakonfigurovany' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
     }
 
-    const totp = new TOTP({ secret: Secret.fromBase32(secret), algorithm: 'SHA1', digits: 6, period: 30 })
+    const totp = new TOTP({ issuer: 'ESHOP BOOSTER', label: 'CRO Report', secret: Secret.fromBase32(secret), algorithm: 'SHA1', digits: 6, period: 30 })
     const valid = totp.validate({ token: code, window: 1 }) !== null
 
     if (!valid) {
