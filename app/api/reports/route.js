@@ -1,5 +1,5 @@
 // API pro ukládání a čtení CRO reportů (Vercel Blob storage)
-import { put, list, del } from '@vercel/blob'
+import { put, list, del, get } from '@vercel/blob'
 import { verifySessionToken } from '../../lib/auth.js'
 
 export const runtime = 'nodejs'
@@ -36,7 +36,7 @@ export async function POST(req) {
     }
 
     const blob = await put(filename, JSON.stringify(data), {
-      access: 'public',
+      access: 'private',
       contentType: 'application/json',
     })
 
@@ -73,8 +73,9 @@ export async function GET(req) {
     const reports = await Promise.all(
       sorted.map(async (blob) => {
         try {
-          const res = await fetch(blob.url)
-          return await res.json()
+          const blobData = await get(blob.url)
+          const text = await blobData.text()
+          return JSON.parse(text)
         } catch {
           return null
         }

@@ -810,7 +810,7 @@ Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY 
               id, url: clientUrl, hostname, analysis: fullAnalysis,
               withClarity: !!withClarity, seconds: Math.round((Date.now() - startTime) / 1000),
               date: new Date().toISOString(),
-            }), { access: 'public', contentType: 'application/json' })
+            }), { access: 'private', contentType: 'application/json' })
             console.log('Report ulozen do Blob:', hostname)
           } catch (blobErr) {
             console.error('Blob save error:', blobErr.message)
