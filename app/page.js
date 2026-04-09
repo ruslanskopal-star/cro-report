@@ -298,12 +298,15 @@ export default function Home() {
       setClientUrl('')
       saveToHistory(url, clean, elapsed)
 
-      // Ulozit do Vercel Blob (fire-and-forget)
+      // Ulozit do Vercel Blob
       fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url, analysis: clean, withClarity: withClarity, seconds: elapsed }),
-      }).catch(function() {})
+      }).then(function(r) {
+        if (!r.ok) console.error('Blob save failed:', r.status)
+        else console.log('Report ulozen do Blob')
+      }).catch(function(e) { console.error('Blob save error:', e.message) })
     } catch(e) {
       setError('Chyba spojeni: ' + e.message)
     }
