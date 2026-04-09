@@ -5,6 +5,8 @@
 // 3. shopContext (segment, obrat, problem) injektovan do promptu
 // 4. Tri vrstvy + matice dopad/narocnost (z v24)
 
+import { put } from '@vercel/blob'
+
 export const runtime = 'nodejs'
 export const maxDuration = 300
 
@@ -496,6 +498,7 @@ export async function POST(req) {
 
     const hostname = clientUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '')
     const baseUrl = clientUrl.startsWith('http') ? clientUrl : `https://${clientUrl}`
+    const startTime = Date.now()
 
     // Preflight: nacti homepage, detekuj kategorii, vrat otazky pro kontext
     if (action === 'preflight') {
@@ -764,6 +767,7 @@ Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY 
       const reader = anthropicResponse.body.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
+      let fullAnalysis = ''
       try {
         while (true) {
           const { done, value } = await reader.read()
@@ -778,12 +782,29 @@ Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY 
             try {
               const parsed = JSON.parse(data)
               if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                fullAnalysis += parsed.delta.text
                 await writer.write(encoder.encode(`data: ${JSON.stringify({ chunk: parsed.delta.text })}\n\n`))
               }
             } catch {}
           }
         }
         await writer.write(encoder.encode('data: [DONE]\n\n'))
+
+        // Ulozit report do Vercel Blob
+        if (fullAnalysis.length > 0) {
+          try {
+            const id = Date.now()
+            const filename = `reports/${hostname}/${id}.json`
+            await put(filename, JSON.stringify({
+              id, url: clientUrl, hostname, analysis: fullAnalysis,
+              withClarity: !!withClarity, seconds: Math.round((Date.now() - startTime) / 1000),
+              date: new Date().toISOString(),
+            }), { access: 'public', contentType: 'application/json' })
+            console.log('Report ulozen do Blob:', hostname)
+          } catch (blobErr) {
+            console.error('Blob save error:', blobErr.message)
+          }
+        }
       } catch (err) {
         await writer.write(encoder.encode(`data: ${JSON.stringify({ error: err.message })}\n\n`))
       } finally {
