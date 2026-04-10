@@ -108,7 +108,8 @@ function resizeAndSplit(file) {
   })
 }
 
-// Pro single sloty (kontakt, onas, ...): cap sirky na 1200 + celkove vysky na 7500
+// Pro single sloty (kontakt, onas, blog, ...): cap sirky na 1200, pro dlouhé stránky
+// CROP na top 1500px (ne scale — zachova citelnost textu). Anthropic many-image limit je 2000px.
 function resizeSingle(file) {
   return new Promise(function(resolve) {
     var reader = new FileReader()
@@ -116,18 +117,22 @@ function resizeSingle(file) {
       var img = new Image()
       img.onload = function() {
         var maxWidth = 1200
-        var w = img.width
-        var h = img.height
-        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth }
-        var maxHeight = 7500
-        if (h > maxHeight) { w = Math.round(w * maxHeight / h); h = maxHeight }
+        var maxHeight = 1500
+        var origW = img.width
+        var origH = img.height
+        var w = origW > maxWidth ? maxWidth : origW
+        var scale = w / origW
+        var scaledH = Math.round(origH * scale)
+        var h = Math.min(scaledH, maxHeight)
         var canvas = document.createElement('canvas')
         canvas.width = w
         canvas.height = h
         var ctx = canvas.getContext('2d')
         ctx.fillStyle = '#ffffff'
         ctx.fillRect(0, 0, w, h)
-        ctx.drawImage(img, 0, 0, w, h)
+        // Crop to top portion (source rect = first h/scale pixels vertically)
+        var sh = Math.round(h / scale)
+        ctx.drawImage(img, 0, 0, origW, sh, 0, 0, w, h)
         resolve(canvas.toDataURL('image/jpeg', 0.75).split(',')[1])
       }
       img.src = e.target.result
