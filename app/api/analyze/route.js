@@ -730,16 +730,15 @@ Pouzij specificke znalosti pro kategorii tohoto e-shopu z databaze. Identifikuj 
 Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY nepouzivej slovo "pravdepodobne".`
 
     // Sestav multimodalni content: screenshoty + text
-    const SLOT_LABELS = {
-      homepage1: 'Homepage (1)', homepage2: 'Homepage (2)', homepage3: 'Homepage (3)',
-      kategorie1: 'Kategorie (1)', kategorie2: 'Kategorie (2)', kategorie3: 'Kategorie (3)',
-      produkt1: 'Produkt (1)', produkt2: 'Produkt (2)', produkt3: 'Produkt (3)',
-      predkosik1: 'Predkosik (1)', predkosik2: 'Predkosik (2)', predkosik3: 'Predkosik (3)',
-      kosik1: 'Kosik (1)', kosik2: 'Kosik (2)', kosik3: 'Kosik (3)', kosik4: 'Kosik (4)', kosik5: 'Kosik (5)',
+    const SLOT_LABELS = {}
+    ;[['homepage','Homepage'],['kategorie','Kategorie'],['produkt','Produkt'],['predkosik','Predkosik'],['kosik','Kosik']].forEach(([k, lbl]) => {
+      for (let i = 1; i <= 6; i++) SLOT_LABELS[k + i] = `${lbl} (${i})`
+    })
+    Object.assign(SLOT_LABELS, {
       thankyou: 'Dekovaci stranka', kontakt: 'Kontakt', doprava: 'Doprava a Platba',
       reklamace: 'Reklamace', onas: 'O nas', blog: 'Blog clanek',
       naseptavac: 'Vyhledavani (naseptavac)', vysledky: 'Vyhledavani (vysledky)',
-    }
+    })
 
     const userContent = []
     let sessionBlobs = []
@@ -835,31 +834,28 @@ Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY 
         }
         await writer.write(encoder.encode('data: [DONE]\n\n'))
 
-        // Ulozit report do Vercel Blob
+        // Ulozit report do Vercel Blob (vcetne referenci na screenshoty)
         if (fullAnalysis.length > 0) {
           try {
             const id = Date.now()
             const filename = `reports/${hostname}/${id}.json`
+            const screenshotRefs = sessionBlobs.map(b => ({
+              slot: b.pathname.split('/').pop().replace('.jpg', ''),
+              pathname: b.pathname,
+            }))
             await put(filename, JSON.stringify({
               id, url: clientUrl, hostname, analysis: fullAnalysis,
               withClarity: !!withClarity, seconds: Math.round((Date.now() - startTime) / 1000),
               date: new Date().toISOString(),
+              sessionId: sessionId || null,
+              screenshots: screenshotRefs,
             }), { access: 'private', contentType: 'application/json' })
-            console.log('Report ulozen do Blob:', hostname)
+            console.log('Report ulozen do Blob:', hostname, 'screeny:', screenshotRefs.length)
           } catch (blobErr) {
             console.error('Blob save error:', blobErr.message)
           }
         }
-
-        // Smaz screenshoty z Blob (po dokonceni analyzy uz nejsou potreba)
-        if (sessionBlobs.length > 0) {
-          try {
-            await Promise.allSettled(sessionBlobs.map(b => del(b.url)))
-            console.log(`[ANALYZE] Screenshoty smazany session=${sessionId}`)
-          } catch (cleanupErr) {
-            console.error('[ANALYZE] Screenshot cleanup error:', cleanupErr.message)
-          }
-        }
+        // Screenshoty NEMAZAT — zustavaji pro historii
       } catch (err) {
         console.error('[ANALYZE] Stream error:', err.message)
         await writer.write(encoder.encode(`data: ${JSON.stringify({ error: 'Chyba pri generovani analyzy' })}\n\n`))

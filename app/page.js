@@ -34,54 +34,93 @@ const LOADING_PHASES = [
 const HISTORY_KEY = 'kris_analyzy_v1'
 const MAX_HISTORY = 5
 
-const SCREENSHOT_SLOTS = [
-  { id: 'homepage1', label: 'Homepage (1)' },
-  { id: 'homepage2', label: 'Homepage (2)' },
-  { id: 'homepage3', label: 'Homepage (3)' },
-  { id: 'kategorie1', label: 'Kategorie (1)' },
-  { id: 'kategorie2', label: 'Kategorie (2)' },
-  { id: 'kategorie3', label: 'Kategorie (3)' },
-  { id: 'produkt1', label: 'Produkt (1)' },
-  { id: 'produkt2', label: 'Produkt (2)' },
-  { id: 'produkt3', label: 'Produkt (3)' },
-  { id: 'predkosik1', label: 'Predkosik (1)' },
-  { id: 'predkosik2', label: 'Predkosik (2)' },
-  { id: 'predkosik3', label: 'Predkosik (3)' },
-  { id: 'kosik1', label: 'Kosik (1)' },
-  { id: 'kosik2', label: 'Kosik (2)' },
-  { id: 'kosik3', label: 'Kosik (3)' },
-  { id: 'kosik4', label: 'Kosik (4)' },
-  { id: 'kosik5', label: 'Kosik (5)' },
-  { id: 'thankyou', label: 'Dekovaci stranka' },
-  { id: 'kontakt', label: 'Kontakt' },
-  { id: 'doprava', label: 'Doprava a Platba' },
-  { id: 'reklamace', label: 'Reklamace' },
-  { id: 'onas', label: 'O nas' },
-  { id: 'blog', label: 'Blog clanek' },
-  { id: 'naseptavac', label: 'Vyhledavani (naseptavac)' },
-  { id: 'vysledky', label: 'Vyhledavani (vysledky)' },
-]
+function makeGroupSlots(prefix, label, count) {
+  var out = []
+  for (var i = 1; i <= count; i++) out.push({ id: prefix + i, label: label + ' (' + i + ')' })
+  return out
+}
 
-function resizeImage(file) {
+const SCREENSHOT_SLOTS = [].concat(
+  makeGroupSlots('homepage', 'Homepage', 6),
+  makeGroupSlots('kategorie', 'Kategorie', 6),
+  makeGroupSlots('produkt', 'Produkt', 6),
+  makeGroupSlots('predkosik', 'Predkosik', 6),
+  makeGroupSlots('kosik', 'Kosik', 6),
+  [
+    { id: 'thankyou', label: 'Dekovaci stranka' },
+    { id: 'kontakt', label: 'Kontakt' },
+    { id: 'doprava', label: 'Doprava a Platba' },
+    { id: 'reklamace', label: 'Reklamace' },
+    { id: 'onas', label: 'O nas' },
+    { id: 'blog', label: 'Blog clanek' },
+    { id: 'naseptavac', label: 'Vyhledavani (naseptavac)' },
+    { id: 'vysledky', label: 'Vyhledavani (vysledky)' },
+  ]
+)
+
+var SLOT_GROUPS = {}
+;['homepage','kategorie','produkt','predkosik','kosik'].forEach(function(k) {
+  SLOT_GROUPS[k] = [1,2,3,4,5,6].map(function(i) { return k + i })
+})
+
+function findSlotGroup(slotId) {
+  for (var k in SLOT_GROUPS) {
+    if (SLOT_GROUPS[k].indexOf(slotId) !== -1) return SLOT_GROUPS[k]
+  }
+  return null
+}
+
+// Pro group sloty: resize na 1200 sirku + rozseka na kusy po 1500px vysky
+function resizeAndSplit(file) {
   return new Promise(function(resolve) {
     var reader = new FileReader()
     reader.onload = function(e) {
       var img = new Image()
       img.onload = function() {
-        // Cap WIDTH na 1200px (zachova citelnost u vysokych celostrankovych screenu)
+        var maxWidth = 1200
+        var chunkHeight = 1500
+        var origW = img.width
+        var origH = img.height
+        var w = origW > maxWidth ? maxWidth : origW
+        var scale = w / origW
+        var h = Math.round(origH * scale)
+        var chunks = []
+        var y = 0
+        while (y < h) {
+          var ch = Math.min(chunkHeight, h - y)
+          var canvas = document.createElement('canvas')
+          canvas.width = w
+          canvas.height = ch
+          var ctx = canvas.getContext('2d')
+          ctx.fillStyle = '#ffffff'
+          ctx.fillRect(0, 0, w, ch)
+          var sy = Math.round(y / scale)
+          var sh = Math.round(ch / scale)
+          ctx.drawImage(img, 0, sy, origW, sh, 0, 0, w, ch)
+          chunks.push(canvas.toDataURL('image/jpeg', 0.75).split(',')[1])
+          y += ch
+        }
+        resolve(chunks)
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
+// Pro single sloty (kontakt, onas, ...): cap sirky na 1200 + celkove vysky na 7500
+function resizeSingle(file) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader()
+    reader.onload = function(e) {
+      var img = new Image()
+      img.onload = function() {
         var maxWidth = 1200
         var w = img.width
         var h = img.height
-        if (w > maxWidth) {
-          h = Math.round(h * maxWidth / w)
-          w = maxWidth
-        }
-        // Omez take celkovou vysku (Claude limit ~8000px)
+        if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth }
         var maxHeight = 7500
-        if (h > maxHeight) {
-          w = Math.round(w * maxHeight / h)
-          h = maxHeight
-        }
+        if (h > maxHeight) { w = Math.round(w * maxHeight / h); h = maxHeight }
         var canvas = document.createElement('canvas')
         canvas.width = w
         canvas.height = h
@@ -89,10 +128,7 @@ function resizeImage(file) {
         ctx.fillStyle = '#ffffff'
         ctx.fillRect(0, 0, w, h)
         ctx.drawImage(img, 0, 0, w, h)
-        // JPEG 0.75 = ~10x mensi nez PNG, stale citelne
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.75)
-        var base64 = dataUrl.split(',')[1]
-        resolve(base64)
+        resolve(canvas.toDataURL('image/jpeg', 0.75).split(',')[1])
       }
       img.src = e.target.result
     }
@@ -248,6 +284,7 @@ export default function Home() {
   var [detectedCategory, setDetectedCategory] = useState('')
   var [screenshots, setScreenshots] = useState({}) // { slotId: { thumb: base64, status: 'uploading'|'ok'|'error' } }
   var [sessionId, setSessionId] = useState('')
+  var [viewingGallery, setViewingGallery] = useState(null) // {sessionId, slots}
   var timerRef = useRef(null)
   var phaseRef = useRef(null)
   var preflightRef = useRef(null)
@@ -340,8 +377,16 @@ export default function Home() {
     return function() { clearTimeout(preflightRef.current) }
   }, [clientUrl])
 
-  function saveToHistory(url, text, dur) {
-    var item = { id: Date.now(), url: url, analysis: text, date: new Date().toLocaleDateString('cs-CZ'), seconds: dur }
+  function saveToHistory(url, text, dur, sid, uploadedSlots) {
+    var item = {
+      id: Date.now(),
+      url: url,
+      analysis: text,
+      date: new Date().toLocaleDateString('cs-CZ'),
+      seconds: dur,
+      sessionId: sid || null,
+      uploadedSlots: uploadedSlots || [],
+    }
     var updated = [item].concat(history).slice(0, MAX_HISTORY)
     setHistory(updated)
     try { localStorage.setItem(HISTORY_KEY, JSON.stringify(updated)) } catch(e) {}
@@ -357,6 +402,11 @@ export default function Home() {
     setDisplayUrl(item.url)
     setAnalysis(item.analysis)
     setTotalSeconds(item.seconds)
+    if (item.sessionId && item.uploadedSlots && item.uploadedSlots.length > 0) {
+      setViewingGallery({ sessionId: item.sessionId, slots: item.uploadedSlots })
+    } else {
+      setViewingGallery(null)
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -367,35 +417,48 @@ export default function Home() {
     return id
   }
 
-  async function handleScreenshot(slotId, file) {
-    if (!file) return
-    var sid = ensureSessionId()
-    var base64 = await resizeImage(file)
-    // Zobraz nahled okamzite jako 'uploading'
+  async function uploadChunk(sid, targetSlot, base64) {
     setScreenshots(function(prev) {
       var next = Object.assign({}, prev)
-      next[slotId] = { thumb: base64, status: 'uploading' }
+      next[targetSlot] = { thumb: base64, status: 'uploading' }
       return next
     })
     try {
       var res = await fetch('/api/upload-screenshot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ authToken: authToken, sessionId: sid, slotId: slotId, base64: base64 }),
+        body: JSON.stringify({ authToken: authToken, sessionId: sid, slotId: targetSlot, base64: base64 }),
       })
       var data = await res.json()
       setScreenshots(function(prev) {
         var next = Object.assign({}, prev)
-        if (data.ok) next[slotId] = { thumb: base64, status: 'ok' }
-        else next[slotId] = { thumb: base64, status: 'error' }
+        next[targetSlot] = { thumb: base64, status: data.ok ? 'ok' : 'error' }
         return next
       })
     } catch (e) {
       setScreenshots(function(prev) {
         var next = Object.assign({}, prev)
-        next[slotId] = { thumb: base64, status: 'error' }
+        next[targetSlot] = { thumb: base64, status: 'error' }
         return next
       })
+    }
+  }
+
+  async function handleScreenshot(slotId, file) {
+    if (!file) return
+    var sid = ensureSessionId()
+    var group = findSlotGroup(slotId)
+    if (group) {
+      var chunks = await resizeAndSplit(file)
+      var startIdx = group.indexOf(slotId)
+      var targetSlots = []
+      for (var i = 0; i < chunks.length && startIdx + i < group.length; i++) {
+        targetSlots.push(group[startIdx + i])
+      }
+      await Promise.all(targetSlots.map(function(s, i) { return uploadChunk(sid, s, chunks[i]) }))
+    } else {
+      var base64 = await resizeSingle(file)
+      await uploadChunk(sid, slotId, base64)
     }
   }
 
@@ -424,6 +487,7 @@ export default function Home() {
     setShopProblem('')
     setScreenshots({})
     setSessionId('')
+    setViewingGallery(null)
     lastPreflightUrl.current = ''
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -503,7 +567,11 @@ export default function Home() {
       setAnalysis(clean)
       setTotalSeconds(elapsed)
       setClientUrl('')
-      saveToHistory(url, clean, elapsed)
+      var uploadedSlots = Object.keys(screenshots).filter(function(k) { return screenshots[k].status === 'ok' })
+      if (sessionId && uploadedSlots.length > 0) {
+        setViewingGallery({ sessionId: sessionId, slots: uploadedSlots })
+      }
+      saveToHistory(url, clean, elapsed, sessionId, uploadedSlots)
       // Report se uklada server-side v route.js po dokonceni streamu
     } catch(e) {
       setError('Chyba spojeni: ' + e.message)
@@ -719,6 +787,27 @@ export default function Home() {
               <div style={{fontFamily:'Arial,sans-serif',lineHeight:'1.7'}}>
                 {analysis.split('\n').map(function(line, i) { return renderLine(line, i) })}
               </div>
+
+              {viewingGallery && viewingGallery.slots.length > 0 && (
+                <div className="no-print" style={{marginTop:'32px',paddingTop:'24px',borderTop:'2px solid #333'}}>
+                  <div style={{color:'#FF6B00',fontSize:'12px',fontWeight:'700',letterSpacing:'3px',textTransform:'uppercase',marginBottom:'16px'}}>
+                    Screenshoty z teto analyzy ({viewingGallery.slots.length})
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'8px'}}>
+                    {viewingGallery.slots.map(function(slot) {
+                      var slotDef = SCREENSHOT_SLOTS.find(function(s) { return s.id === slot })
+                      var label = slotDef ? slotDef.label : slot
+                      var src = '/api/screenshot?sessionId=' + encodeURIComponent(viewingGallery.sessionId) + '&slot=' + encodeURIComponent(slot) + '&token=' + encodeURIComponent(authToken || '')
+                      return (
+                        <a key={slot} href={src} target="_blank" rel="noreferrer" style={{border:'1px solid #333',borderRadius:'6px',overflow:'hidden',textDecoration:'none',background:'#111'}}>
+                          <img src={src} alt={label} style={{width:'100%',display:'block'}} loading="lazy" />
+                          <div style={{padding:'6px 10px',color:'#888',fontSize:'11px',fontFamily:'Arial,sans-serif',borderTop:'1px solid #2a2a2a'}}>{label}</div>
+                        </a>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div style={{marginTop:'32px',paddingTop:'16px',borderTop:'1px solid #2a2a2a',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                 <div style={{color:'#333',fontSize:'12px',fontFamily:'Arial,sans-serif'}}>ESHOP BOOSTER 2026 &bull; Ruslan Skopal</div>
