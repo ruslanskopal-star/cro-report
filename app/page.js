@@ -68,19 +68,29 @@ function resizeImage(file) {
     reader.onload = function(e) {
       var img = new Image()
       img.onload = function() {
-        var maxDim = 1568
+        // Cap WIDTH na 1200px (zachova citelnost u vysokych celostrankovych screenu)
+        var maxWidth = 1200
         var w = img.width
         var h = img.height
-        if (w > maxDim || h > maxDim) {
-          if (w > h) { h = Math.round(h * maxDim / w); w = maxDim }
-          else { w = Math.round(w * maxDim / h); h = maxDim }
+        if (w > maxWidth) {
+          h = Math.round(h * maxWidth / w)
+          w = maxWidth
+        }
+        // Omez take celkovou vysku (Claude limit ~8000px)
+        var maxHeight = 7500
+        if (h > maxHeight) {
+          w = Math.round(w * maxHeight / h)
+          h = maxHeight
         }
         var canvas = document.createElement('canvas')
         canvas.width = w
         canvas.height = h
         var ctx = canvas.getContext('2d')
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, w, h)
         ctx.drawImage(img, 0, 0, w, h)
-        var dataUrl = canvas.toDataURL('image/png')
+        // JPEG 0.75 = ~10x mensi nez PNG, stale citelne
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.75)
         var base64 = dataUrl.split(',')[1]
         resolve(base64)
       }
@@ -597,7 +607,7 @@ export default function Home() {
                       <div key={slot.id} style={{position:'relative',border:'1px solid ' + (hasImg ? '#FF6B00' : '#333'),borderRadius:'6px',overflow:'hidden',background:'#111'}}>
                         {hasImg ? (
                           <div style={{position:'relative'}}>
-                            <img src={'data:image/png;base64,' + screenshots[slot.id]} alt={slot.label} style={{width:'100%',maxHeight:'80px',objectFit:'cover',display:'block'}} />
+                            <img src={'data:image/jpeg;base64,' + screenshots[slot.id]} alt={slot.label} style={{width:'100%',maxHeight:'80px',objectFit:'cover',display:'block'}} />
                             <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center'}}>
                               <span style={{color:'#FF6B00',fontSize:'11px',fontWeight:'700',fontFamily:'Arial,sans-serif'}}>{slot.label}</span>
                             </div>
@@ -613,11 +623,17 @@ export default function Home() {
                     )
                   })}
                 </div>
-                {Object.keys(screenshots).length > 0 && (
-                  <div style={{color:'#4CAF50',fontSize:'11px',fontFamily:'Arial,sans-serif',marginTop:'8px'}}>
-                    {Object.keys(screenshots).length} screenshot{Object.keys(screenshots).length > 1 ? 'u' : ''} nahrano
-                  </div>
-                )}
+                {Object.keys(screenshots).length > 0 && (() => {
+                  var totalBytes = 0
+                  Object.values(screenshots).forEach(function(b) { totalBytes += b.length * 0.75 })
+                  var mb = (totalBytes / 1024 / 1024).toFixed(1)
+                  var tooBig = totalBytes > 4000000
+                  return (
+                    <div style={{color:tooBig?'#ff4444':'#4CAF50',fontSize:'11px',fontFamily:'Arial,sans-serif',marginTop:'8px'}}>
+                      {Object.keys(screenshots).length} screenshotu nahrano ({mb} MB){tooBig ? ' — PRILIS VELKE, odstrante nejake' : ''}
+                    </div>
+                  )
+                })()}
               </div>
             )}
 

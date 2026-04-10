@@ -750,7 +750,7 @@ Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY 
         for (const [slotId, base64] of entries) {
           const label = SLOT_LABELS[slotId] || slotId
           userContent.push({ type: 'text', text: `Screenshot: ${label}` })
-          userContent.push({ type: 'image', source: { type: 'base64', media_type: 'image/png', data: base64 } })
+          userContent.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } })
         }
       }
     }
