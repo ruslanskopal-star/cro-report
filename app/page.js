@@ -430,12 +430,18 @@ export default function Home() {
         body: JSON.stringify({ authToken: authToken, sessionId: sid, slotId: targetSlot, base64: base64 }),
       })
       var data = await res.json()
+      if (!data.ok && data.error) {
+        console.error('Upload error [' + targetSlot + ']:', data.error)
+        setError('Upload chyba: ' + data.error)
+      }
       setScreenshots(function(prev) {
         var next = Object.assign({}, prev)
         next[targetSlot] = { thumb: base64, status: data.ok ? 'ok' : 'error' }
         return next
       })
     } catch (e) {
+      console.error('Upload network error:', e.message)
+      setError('Upload network chyba: ' + e.message)
       setScreenshots(function(prev) {
         var next = Object.assign({}, prev)
         next[targetSlot] = { thumb: base64, status: 'error' }
