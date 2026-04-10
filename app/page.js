@@ -34,6 +34,53 @@ const LOADING_PHASES = [
 const HISTORY_KEY = 'kris_analyzy_v1'
 const MAX_HISTORY = 5
 
+const SCREENSHOT_SLOTS = [
+  { id: 'homepage', label: 'Homepage' },
+  { id: 'kategorie', label: 'Kategorie' },
+  { id: 'produkt', label: 'Produkt' },
+  { id: 'kosik1', label: 'Kosik (1)' },
+  { id: 'kosik2', label: 'Kosik (2)' },
+  { id: 'kosik3', label: 'Kosik (3)' },
+  { id: 'kosik4', label: 'Kosik (4)' },
+  { id: 'kosik5', label: 'Kosik (5)' },
+  { id: 'thankyou', label: 'Dekovaci stranka' },
+  { id: 'kontakt', label: 'Kontakt' },
+  { id: 'doprava', label: 'Doprava a Platba' },
+  { id: 'reklamace', label: 'Reklamace' },
+  { id: 'onas', label: 'O nas' },
+  { id: 'blog', label: 'Blog clanek' },
+  { id: 'naseptavac', label: 'Vyhledavani (naseptavac)' },
+  { id: 'vysledky', label: 'Vyhledavani (vysledky)' },
+]
+
+function resizeImage(file) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader()
+    reader.onload = function(e) {
+      var img = new Image()
+      img.onload = function() {
+        var maxDim = 1568
+        var w = img.width
+        var h = img.height
+        if (w > maxDim || h > maxDim) {
+          if (w > h) { h = Math.round(h * maxDim / w); w = maxDim }
+          else { w = Math.round(w * maxDim / h); h = maxDim }
+        }
+        var canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        var ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, w, h)
+        var dataUrl = canvas.toDataURL('image/png')
+        var base64 = dataUrl.split(',')[1]
+        resolve(base64)
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
 // Sanitizace pomlcek - volana pri ulozeni textu
 function cleanDashes(text) {
   var result = ''
@@ -180,6 +227,7 @@ export default function Home() {
   var [preflightDone, setPreflightDone] = useState(false)
   var [preflightLoading, setPreflightLoading] = useState(false)
   var [detectedCategory, setDetectedCategory] = useState('')
+  var [screenshots, setScreenshots] = useState({})
   var timerRef = useRef(null)
   var phaseRef = useRef(null)
   var preflightRef = useRef(null)
@@ -292,6 +340,24 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  async function handleScreenshot(slotId, file) {
+    if (!file) return
+    var base64 = await resizeImage(file)
+    setScreenshots(function(prev) {
+      var next = Object.assign({}, prev)
+      next[slotId] = base64
+      return next
+    })
+  }
+
+  function removeScreenshot(slotId) {
+    setScreenshots(function(prev) {
+      var next = Object.assign({}, prev)
+      delete next[slotId]
+      return next
+    })
+  }
+
   function handleNovaAnalyza() {
     setAnalysis('')
     setDisplayUrl('')
@@ -302,6 +368,7 @@ export default function Home() {
     setShopSegment('')
     setShopObrat('')
     setShopProblem('')
+    setScreenshots({})
     lastPreflightUrl.current = ''
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -337,7 +404,7 @@ export default function Home() {
       var res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientUrl: url, withClarity: withClarity, authToken: authToken, shopContext: { segment: shopSegment, obrat: shopObrat, problem: shopProblem } }),
+        body: JSON.stringify({ clientUrl: url, withClarity: withClarity, authToken: authToken, shopContext: { segment: shopSegment, obrat: shopObrat, problem: shopProblem }, screenshots: screenshots }),
       })
 
       if (!res.ok || !res.body) {
@@ -507,6 +574,40 @@ export default function Home() {
                       })}
                     </div>
                   </>
+                )}
+              </div>
+            )}
+
+            {preflightDone && (
+              <div style={{marginTop:'16px',paddingTop:'16px',borderTop:'1px solid #222'}}>
+                <div style={{color:'#555',fontSize:'11px',fontWeight:'700',letterSpacing:'2px',textTransform:'uppercase',marginBottom:'10px',fontFamily:'Arial,sans-serif'}}>Screenshoty stranek (volitelne)</div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px'}}>
+                  {SCREENSHOT_SLOTS.map(function(slot) {
+                    var hasImg = !!screenshots[slot.id]
+                    return (
+                      <div key={slot.id} style={{position:'relative',border:'1px solid ' + (hasImg ? '#FF6B00' : '#333'),borderRadius:'6px',overflow:'hidden',background:'#111'}}>
+                        {hasImg ? (
+                          <div style={{position:'relative'}}>
+                            <img src={'data:image/png;base64,' + screenshots[slot.id]} alt={slot.label} style={{width:'100%',maxHeight:'80px',objectFit:'cover',display:'block'}} />
+                            <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                              <span style={{color:'#FF6B00',fontSize:'11px',fontWeight:'700',fontFamily:'Arial,sans-serif'}}>{slot.label}</span>
+                            </div>
+                            <button onClick={function() { removeScreenshot(slot.id) }} style={{position:'absolute',top:'4px',right:'4px',width:'18px',height:'18px',borderRadius:'50%',border:'none',background:'#ff4444',color:'white',fontSize:'11px',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',padding:0,lineHeight:1}}>x</button>
+                          </div>
+                        ) : (
+                          <label style={{display:'flex',alignItems:'center',justifyContent:'center',padding:'10px 8px',cursor:'pointer',gap:'6px'}}>
+                            <span style={{color:'#555',fontSize:'11px',fontFamily:'Arial,sans-serif'}}>{slot.label}</span>
+                            <input type="file" accept="image/png,image/jpeg,image/webp" style={{display:'none'}} onChange={function(e) { if (e.target.files[0]) handleScreenshot(slot.id, e.target.files[0]) }} />
+                          </label>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+                {Object.keys(screenshots).length > 0 && (
+                  <div style={{color:'#4CAF50',fontSize:'11px',fontFamily:'Arial,sans-serif',marginTop:'8px'}}>
+                    {Object.keys(screenshots).length} screenshot{Object.keys(screenshots).length > 1 ? 'u' : ''} nahrano
+                  </div>
                 )}
               </div>
             )}

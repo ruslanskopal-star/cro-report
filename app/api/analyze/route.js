@@ -446,7 +446,7 @@ function formatMultiPageContext(crawlData) {
 
 export async function POST(req) {
   try {
-    const { clientUrl, withClarity, reportMode, shopContext, action, authToken } = await req.json()
+    const { clientUrl, withClarity, reportMode, shopContext, action, authToken, screenshots } = await req.json()
 
     // Overeni session tokenu
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
@@ -725,9 +725,34 @@ ${structureInstruction}
 
 Pouzij specificke znalosti pro kategorii tohoto e-shopu z databaze. Identifikuj kategorii z URL a nazvu e-shopu.`
 
-    const userMessage = `Priprav CRO analyzu pro e-shop: ${clientUrl}
+    const userMessageText = `Priprav CRO analyzu pro e-shop: ${clientUrl}
 
 Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY nepouzivej slovo "pravdepodobne".`
+
+    // Sestav multimodalni content: screenshoty + text
+    const SLOT_LABELS = {
+      homepage: 'Homepage', kategorie: 'Kategorie', produkt: 'Produkt',
+      kosik1: 'Kosik (1)', kosik2: 'Kosik (2)', kosik3: 'Kosik (3)', kosik4: 'Kosik (4)', kosik5: 'Kosik (5)',
+      thankyou: 'Dekovaci stranka', kontakt: 'Kontakt', doprava: 'Doprava a Platba',
+      reklamace: 'Reklamace', onas: 'O nas', blog: 'Blog clanek',
+      naseptavac: 'Vyhledavani (naseptavac)', vysledky: 'Vyhledavani (vysledky)',
+    }
+
+    const userContent = []
+
+    if (screenshots && typeof screenshots === 'object') {
+      const entries = Object.entries(screenshots)
+      if (entries.length > 0) {
+        userContent.push({ type: 'text', text: `Prikladam ${entries.length} celostrankovy screenshot${entries.length > 1 ? 'u' : ''} webu ${clientUrl}. Analyzuj co na nich SKUTECNE vidis. Netvrdi ze neco chybi, kdyz to na screenshotu je.` })
+        for (const [slotId, base64] of entries) {
+          const label = SLOT_LABELS[slotId] || slotId
+          userContent.push({ type: 'text', text: `Screenshot: ${label}` })
+          userContent.push({ type: 'image', source: { type: 'base64', media_type: 'image/png', data: base64 } })
+        }
+      }
+    }
+
+    userContent.push({ type: 'text', text: userMessageText })
 
     const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -741,7 +766,7 @@ Identifikuj kategorii produktu. Bud maximalne konkretni pro TENTO e-shop. NIKDY 
         max_tokens: 8000,
         stream: true,
         system: systemPrompt,
-        messages: [{ role: 'user', content: userMessage }],
+        messages: [{ role: 'user', content: userContent }],
       }),
     })
 
