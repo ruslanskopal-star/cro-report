@@ -1,0 +1,656 @@
+// ESHOP BOOSTER — interni CRO checklist
+// Zdroj: Ruslan Skopal + kolegove (Google Doc, Skool, COE 2025 prezentace Honzy Kvasnicky)
+// Pouziti: route.js injektuje do system promptu s NEJVYSSI prioritou
+//
+// POZNAMKA KRIS: Toto je zavazny hodnoticí ramec. Hodnot web PRIMARNĚ podle
+// polozek v tomto checklistu. Polozky mimo checklist jsou druhorade.
+
+export const ESHOP_BOOSTER_CHECKLIST = `
+# ESHOP BOOSTER — KLIENTSKY CHECKLIST (MAX PRIORITA)
+
+## FILOZOFIE A KONTEXT
+
+### Google Duveryhodnostni matice (era AI od 09/2025)
+Google zavedl "duveryhodnostni matici" jako reakci na AI generated obsah. Cilem je
+odlisit autenticky lidsky obsah od AI obsahu. Google nove hodnoti weby podle:
+- Autenticky vlastni obsah (NE AI balast, NE kopie od dodavatele)
+- Signifikantni (jasne rozpoznatelne) prvky znacky
+- Medialni obsah na strance (vlastni fotky, videa)
+- Interni prolinkovani
+- Pribeh znacky / O nas
+- Osobni kontakt (jmeno + fotka + telefon + cas dostupnosti)
+- Recenze / hodnoceni (optimum 4,2-4,7, min 50)
+- FAQ s schema markup
+- Authority rank — lide ve firme, nazor odbornika
+
+### Google Skore kvality vstupni stranky
+- Skala 0-99, neni verejne dostupna, jina pro hlavni domenu a dilci URL
+- Ovlivnuje: SEO pozice, cenu prokliku (o 20-30 %), AI Overview
+- Zakladni benchmark segmentu ~45-50 bodu
+- Vyssi segmenty (napr. vyziva/zdravi) az ~61 bodu
+- AI obsah penalizace od 01/2026: vice nez 60 % AI nebo genericky obsah = postih
+
+### Design standardy (povinne Google pravidla)
+- Pismo NIKDY mensi nez 13px (penalizace), idealne 16px hlavni obsah
+- Kontrastni pomer min 4,5:1 (WCAG), overit na color.review
+- Touch zony min 7x7 mm s 2mm rozestupy (EU zakon od 06/2025)
+- Seda barva pro aktivni prvky = CHYBA
+- Konverzni barva pouze pro konverzni prvky (nezanaset do jinych prvku)
+- Velikost kazdeho obrazku idealne pod 100 kB (rychlost nacitani)
+- Core Web Vitals v zelenych cislech (PageSpeed Insights)
+
+### Hlavni princip
+"Ukazte ze jste zubar" — prokazte zakaznikovi ze jste odbornik ve svem segmentu.
+Duveryhodnost je u vetsiny e-shopu nejvetsi prostor pro vylepseni.
+
+---
+
+## 4 VLNY PRIORITIZACE
+
+Prace na webu se rozdeluje do 4 vln podle dopadu a narocnosti.
+
+### 1. VLNA (max dopad, max priorita)
+- Reference na HP, kategorii, detailu produktu
+- Upselly v kosiku a predkosiku
+- USP lista + proklikavajici na staticke stranky k USP
+- Mobil: hamburger menu VPRAVO
+- Eliminace "mega pruseru" (cokoli co kriticky blokuje konverzi)
+- Quick wins: poradi kategorii/produktu podle dat prodeju, kolo stesti
+
+### 2. VLNA (duveryhodnost a kontakt)
+- Viditelny kontakt s fotkou + status online/offline
+- Hlavicka: telefon s obličejem, horni lista hodnoceni
+- Nazor odbornika na detailu produktu
+- Stranka kontaktu: fotky tymu, kamenna prodejna
+- Pole vyhledavani: desktop + mobil viditelne
+- Hello bar (barva, kontrast)
+- Kosik: zakladni opravy chyb
+- Mobilni verze: odstraneni zakladnich chyb
+- Detail produktu: oprava nejvetsich chyb (chybi skladem, anglicke nazvy)
+- Infografika do galerie TOP produktu
+- Univerzalni duvody "Proc nakoupit zrovna u vas"
+
+### 3. VLNA (kategorie a filtry)
+- Filtry + rozcestniky napric webem
+- Texty kategorii
+- Rozcestnik ala Olivie
+- Zobrazeni produktu (detail vs. do kosiku)
+- Hello bar — plne vyuziti potencialu
+- PageSpeed Core Web Vitals
+
+### 4. VLNA (doladeni popisku a FAQ)
+- Popisky produktu — vylepsit 20 % nejdulezitejsich
+- FAQ doplnit
+- Nahledove obrazky po najeti mysi
+- Zbyle staticke stranky (kontakt, doprava atd.)
+
+---
+
+## HLAVICKA A NAVIGACE
+
+### Logo s dovetkem
+Logo musi mit pod sebou "dovetek nazvu" = specializaci e-shopu.
+- Zakaznik behem vteriny vi kde se nachazi a co e-shop prodava
+- Prodava vasi specializaci napric celym webem
+- Priklady: trenyrkarna.cz, andos.cz, v-mart.cz, hooray.cz
+
+### Heureka logo mezi logem a vyhledavanim
+Zvysuje duveryhodnost e-shopu + prodava super hodnoceni.
+- Priklad: Oveckarna
+
+### Horni lista — hodnoceni e-shopu
+Umistit informace o hodnoceni / spokojenych zakaznicich do horni lišty.
+- Vidi se napric celym webem
+- Priklady: myboobee.com, psinakup.cz, deadiacosmetics.cz
+
+### Info menu lista
+Velmi silny prvek duveryhodnosti + orientace.
+Polozky (individualne podle e-shopu, na zaklade dat):
+- Kontakt (POVINNE)
+- Nase produkty (pokud mam co rict o odliseni)
+- Blog
+- Garance vraceni penez
+- Pribehy zakazniku / Pred-Po
+- Jak pouzivat produkty
+- Caste dotazy (FAQ)
+- Recenze (POVINNE)
+- O nas
+- Nase odliseni / Proc nakoupit u nas
+- Kamenna prodejna (pokud ma)
+ZAKAZANO: Obchodni podminky v menu (patri do paticky)
+- Priklady: brainmarket.cz, balistas.cz, mountfield.cz, tescoma.cz, herbyway.cz
+
+### Viditelny kontakt v hlavicce (KRITICKY)
+Telefon + email rovnou v hlavicce WEBU + OBLICEJ poradkyne + zelene/cervene kolecko
+(online/offline status). Je to jedna z nejsilnejsich konverznich pak pro e-shopy.
+- Hlavicka: herbyway.cz, denatura.cz
+- Mobilni verze: denatura.cz
+- U telefonu uvest od-do kolika muzu volat
+
+### Patička — kontakt s fotkou (druhe misto)
+Ta stejna osoba s fotkou i v paticce.
+- Priklady: herbyway.cz, denatura.cz, kulina.cz
+
+### Rozbalovaci hamburger kontakt
+Jednoduchy pristup k celemu kontaktu na jeden klik.
+- Priklady: nazuby.cz, denatura.cz, trenyrkarna.cz, kulina.cz
+
+### Pole pro vyhledavani — desktop
+Musi byt VYRAZNE, zakaznik ho musi hned videt.
+- Nevyrazne pole = ztrata konverzi (zakaznik nehleda = nenakoupi)
+- Pro zakazniky kteri hledaji je konverzni pomer 2-3x vyssi nez ostatni
+- Ideal: "hybajici se text" v placeholderu s vychozim vyhledavanym vyrazem
+- Priklady: brainmarket.cz, herbyway.cz, kulina.cz, balistas.cz, svihej.cz
+
+### Pole pro vyhledavani — mobil (KRITICKY)
+Na mobilu je pole casto "utopene" a neni vubec videt. Musi byt POKIRNE videt,
+ideal i kdyz otevrenem hamburger menu.
+- Priklady: trenyrkarna.cz, aktin.cz, nazuby.cz, kulina.cz, herbyway.cz
+
+### Menu — poradi kategorii podle dat
+Nejprodavanejsi kategorie = prvni. Nejprodavanejsi podkategorie = prvni. Nejprodavanejsi produkt = prvni.
+
+---
+
+## HOMEPAGE
+
+### Hello bar (informacni lista napric webem)
+Velmi silny prvek pro promo akcí, slev, informaci. Nejlepsi efekt vznika kdyz:
+1. Hello bar informuje o akci
+2. Stejna informace je na urovni kategorie
+3. Stejna informace je i na detailu produktu
+Teprve kombinace tri mist vytvari "hokejkovy efekt" v trzbach (data od Honzy Bartose z GAP).
+- SPRAVNE: trenyrkarna.cz, denatura.cz (viditelny, vyrazny kontrast)
+- SPATNE: tescoma.cz (cerna+tmave seda = lista neni videt)
+- FOMO efekt na detailu produktu: elenys.cz, nanospace.cz
+- FOMO na kategorii: elenys.cz (v ramci vypisu), tarani.cz (odpocet akce)
+- Barva: vyrazna (zelena emos.cz, cervena dajanarodriguez.cz)
+- Pozor na kontrast — WCAG pravidla
+
+### Slider
+- Idealni pocet slideru na HP: 2 (vice je kontraproduktivni a zpomaluje nacitani)
+- Kazdy banner musi mit CTA tlacitko (vyzvu k akci)
+- Bez CTA = mnohem nizsi proklikovost
+- Slider musi splnovat "squint test" (hlavni sdeleni musi byt citelne i kdyz sklapnete oci)
+- SPRAVNE: hannibal.cz, brainmarket.cz, alza.cz (loga partneru upazadena)
+
+### Staticke hero
+Staticke hero s JEDNOU nabidkou a JEDNOU vyzvou je casto lepsi nez slider.
+
+### Hlavni claim pred USP
+Zvyraznit hlavni claim e-shopu jeste pred USP listou.
+- Priklad: denatura.cz
+
+### USP lista (KRITICKY)
+USP lista MUSI byt na KAZDE vstupni strance (homepage, kategorie, produkt, kontakt).
+- Absence USP listy prokazatelne snizuje vsechny konverzni metriky (Zbysek Nadenik studie)
+- Nazvy USP: konkretni + dovetek (herbyway.cz, balistas.cz)
+- KRITICKE: USP musi byt PROKLIKAVAJICI na podrobne staticke stranky
+- Pokud USP nejsou proklikavajici, efekt je KONTRAPRODUKTIVNI
+  ("navnadim se ale nemohu se dozvedet vic, e-shop neco skryva")
+
+### Staticke stranky k USP
+Kazda vyhoda musi mit vlastni podrobnou statickou stranku.
+Priklady kvalitnich statickych stranek:
+- x-trenink.cz/produkty-testujeme-vyrobeno-v-cr
+- zivina.cz/o-nas/#fresh
+- podlahyplotz.cz/doprava-a-platba
+- ollies.cz (kvalita a cerstvost, pripraveno s laskou)
+- svet-koupelny.cz/doprava
+- brainmarket.cz/prodejna-brainmarket-ostrava
+- ikea.com/cz/cs/customer-service/services/delivery
+- denatura.cz/slozeni-produktu-denatura
+- koupelnysyrovy.cz/prodlouzena-zaruka
+- nanospace.cz/vyrobeno-v-cr
+
+### Recenze / reference na HP
+Recenze musi byt na HP co NEJVYS (ne jen dole).
+- Zlate hvezdicky (zasadne NE sede) — mozek okamzite pozna pozitivni hodnoceni
+- 4 recenze vedle sebe + proklik na vsechny
+- Ruční vyber 12 "nejlepsich" recenzi — rotuji pri nacteni stranky
+- Pravidlo: recenze z poslednich 30 dni, min 30 znaku
+- Symbol "overene recenze" + logo zdroje (Heureka, Google)
+- Foto reference (fotky spokojenych zakazniku) = 2x vyssi konverze
+- Priklady: x-trenink.cz, denatura.cz, bloomrobbins.cz, herbyway.cz, zdravybatoh.cz, svihej.cz
+
+### Loga Heureka + dalsi sluzby (spodni cast HP)
+Ve spodni casti HP: logo Heureky, Google, prepravcu, platebnich metod, partnery.
+- Zvysuje konverzni pomer, Google to v indexaci hodnoti pozitivne
+- Priklady: denatura.cz, herbyway.cz
+
+### Proc nase produkty (graficky)
+Vizualne prezentovat proc si zakaznik ma vybrat vase produkty.
+- Priklady: marmeladyspribehem.cz, zivina.cz, denatura.cz, herbyway.cz, bloomrobbins.cz
+
+### Rychly rozcestnik (dlazdice)
+Dlazdice na HP jsou VYRAZNY podil na proklikovosti (Clarity data z trenyrkarna.cz).
+- Zvazit rozcestnik podle ucelu/situace (do prace, na dovolenou — tallguys.cz)
+- Rozcestnik podle parametru (kancelarskezidle.com — podle vysky postavy, ceny)
+- Rozcestnik podle mistnosti/stylu (breno.cz)
+- Poradi dlazdic VZDY podle dat prodeju
+- Cilem: zakaznik do "cile" (produkt) na max 3 kliky
+- Priklady: nazuby.cz, kulina.cz, balistas.cz, 4camping.cz
+
+### Text na HP s vnitrnim prolinkovanim
+Pokud se na HP uziva text, MUSI obsahovat vnitrni prolinkovani na klicove kategorie a staticke stranky.
+Bez prolinkovani = nevyuzity SEO potencial.
+- Priklady kvalitneho textu HP: herbyway.cz, denatura.cz
+- Varianta: kratke video (donlemme.cz)
+
+### Newsletter subscription
+Vyzva "prihlasit se k odberu" musi byt zpracovana zajimave s ukazkou produktu.
+- Priklady: pranamat.cz, kulina.cz
+
+### Patička — kompletni
+Vyuzit potencial na maximum.
+- Kontakt s fotkou + status (herbyway, denatura, kulina)
+- Loga Heureka/Google/prepravci/plateb
+- Kamenna prodejna (meetyshop.com)
+- Priklady: kulina.cz, denatura.cz, herbyway.cz, nazuby.cz
+
+---
+
+## KATEGORIE
+
+### Meta data + SEO (pro klicove kategorie)
+- Zvyraznit vyhody v title a description
+- Pouzivat symboly (napr. ✳️) pro vizualni odliseni ve vysledcích
+- Priklad titulku: "OD EXPERTU" kapitalkami (grilovani.cz)
+- Dynamicky titulek s aktualni slevou (benu.cz)
+
+### Popis kategorie
+NE dlouhy SEO text — max 3-5 vet.
+- Misto SEO textu: zvyseni kredibility + rozcestnik na informace
+- Varianta "Informace navrch, Zjistete vice na konci" (prolinkovani dolu)
+- SEO princip: psat pro lidi, ne pro vyhledavace
+- Priklady: profiDJ (odbornost), grilovani.cz
+
+### Dynamicky title pri filtrovani
+Pri filtrovani "nejlevnejsi" zmenit title a nadpis na "Levne [kategorie]".
+- Zvysuje SEO zasah na ruzne obraty
+- Priklad: hudy.cz
+
+### Jasne zobrazeni podkategorii
+Dlazdice podkategorii v hornim casti kategorie. Pozor na mobilni verzi.
+
+### Barevne varianty ve vypise (fashion)
+Zobrazovat barevne varianty rovnou ve vypise produktu.
+- Jeden produkt se zmenou barvy (astratex.cz, dobrytextil.cz)
+- Alternativa: samostatne produkty vedle sebe (4camping.cz, ikea)
+- Pravidlo Honza Kvasnicka: zavisi na sire sortimentu
+
+### Filtry (VELMI KRITICKE)
+- Filtry MUSI byt rovnou ROZBALENE, NE sbalene
+- Rozbaleneho filtru si vsimne vyrazne vic lidi
+- Pozor na poradi filtru — podle dulezitosti a hledanosti
+- Filtrace podle prodejny (Alza)
+- Priklady: alza.cz, dalsi spravne priklady ve Figma dokumentech
+
+### Stitky produktu (KRITICKY pro konverzi)
+Stitky "lidovka", "zlata stredni cesta", "pro narocne" maji OBROVSKY vliv na konverze.
+- Ridi zakaznikovo rozhodovani
+- Alternativa: vlastni "peceete" / ocenneni (brainmarket, ketodiet, ebenica, pepperfield)
+- Dalsi stitky: bestseller, novinka, sleva, posledni kusy, doporucujeme
+- Implementovat jako CSS overlay na fotografii, ne pod ni
+- Priklady: Sufan, zdravybatoh.cz, nazuby.cz
+
+### Vlastni ocenneni / peceete
+Misto klasickych stitku vlastni vizual odlisuje top produkty.
+- Priklady: ketodiet.cz, ebenica.cz, pepperfield.cz, bloomrobbins.cz
+
+### Hodnoceni (hvezdicky) — jen kde jsou
+Prazdne hvezdicky / nizka hodnoceni NEZOBRAZOVAT.
+- Zobrazit jen zlate hvezdicky u produktu s dobrym hodnocenim
+- Priklady: spravny vzor
+
+### Nahledovy obrazek po najetí (hover)
+Druha fotografie nebo infografika pri najetí mysi.
+- Moda: pohled zezadu, druhe obleceni
+- Specialky: infografika s klicovymi informacemi
+
+### Termin dodani + SKLADEM ve vypise
+Zakaznik musi videt "skladem" a "dorucime do" primo ve vypise.
+- Pozor na mobilni verzi
+- Priklady: konkretni e-shopy
+
+### CTA tlacitko "Detail / Zobrazit"
+Chybi-li CTA tlacitko pod produktem v kategorii, proklikovost klesa.
+- Platí pro produkty nad ~300 Kc (pod 300 Kc casto funguje "do kosiku" primo)
+- Priklady chyb: trenyrkarna.cz, x-trenink.cz, kulina.cz
+
+### Poradi produktu
+Nejprodavanejsi produkty na prvnich mistech.
+- "Zvyraznit nejprodavanejsi stitkem s poradim prodejnosti v kategorii"
+
+---
+
+## DETAIL PRODUKTU
+
+### Cesky nazev
+NE anglicke nazvy. Cesky popis produktu v nazvu.
+- Pripadne parovani s Heurekou resit feedem, ne nazvem
+- Pokud menite nazev existujiciho produktu, NEMENIT URL
+- Priklady spatne: anglicky nazev granuli. Spravne: "Granule z kacniho masa..."
+
+### Klicove informace v nazvu
+Do nazvu zanest co nejvic hodnotnych informaci.
+- Pozornost zakaznika je na nazvu nejvyssi
+- Priklad: aktin.cz (nazvy s kompletni specifikaci)
+
+### Reference primo pod nazvem (KRITICKY)
+Hvezdicky + pocet recenzi primo pod nazvem produktu.
+- Rozhodujici pro dalsi cteni
+- Priklady: herbyway.cz, svihej.cz, ketodiet.cz, cubenest
+
+### Piktogramy / badge benefitu
+Graficke znazorneni benefitu nad/u popisku.
+- Rychla vizualni identifikace
+- Priklady: konkretni e-shopy (viz dokument)
+
+### Bodove shrnuti klicovych informaci
+Pred podrobnym popiskem: bodovy seznam "Co produkt dela / pro koho je".
+- Priklady: denatura.cz, x-trenink.cz, zivina.cz, cubenest.cz
+
+### Pro koho se hodi / Pro koho se nehodi
+Explicitne oznacit cilove segmenty + kontraindikace.
+- Snizuje vraceni zbozi o 15-20 %
+- Format: "Produkt je idealni pro [segment]. Neni vhodny pro [segment]."
+- Funguje ve KAZDE kategorii (kosmetika=typ pleti, sport=uroven, nabytek=styl)
+
+### Termin dodani s "dnes / zitra / pozitri" + datum
+Lidé casto nevedi aktualni datum, ale "dnes/zitra" chapou vsichni.
+- Priklady SPRAVNE: trenyrkarna.cz, cubenest.cz
+- Priklady SPATNE: astratex.cz (jen datum), x-trenink.cz
+- Nastaveni "doruci do": https://www.skool.com/eshop-booster-mastermind (clanek)
+
+### Jen koncove ceny (vcetne DPH)
+Cena bez DPH matlouci. Odstranit.
+
+### Skladovost na prodejnach (API)
+Pokud ma kamenne prodejny, zobrazit dostupnost na prodejnach.
+- Realna data z API
+- Pod tlacitkem/rozkliknutim aby nematlo online kupce (Datart, iSetos)
+- Priklad primo v detailu: alza.cz
+
+### Galerie produktu — infografika (TOP produkty)
+V galerii produktu mit infografiky s klicovymi informacemi.
+- Priklady: spravne infografiky pro TOP produkty
+- Zvysuje konverze az o 80 %
+
+### Gif videa v galerii
+Kratke gif video u klicovych produktu.
+- Brutalne zvedne vnimani produktu
+- Priklady: konkretni e-shopy
+
+### Reference do galerie
+Pracovat s galerii jako s marketingovou plochou.
+- Fotka 1: produkt
+- Fotka 2: produkt v pouziti
+- Fotka 3: infografika
+- Fotka 4: reference/recenze s fotografii zakaznika
+- Priklady: spravne galerie
+
+### "Kolik uz zakazniku koupilo"
+Grafické znazorneni poctu prodanych kusu.
+- Priklady: denatura.cz, herbyway.cz, froyaorganics.com
+
+### Jak dlouho vydrzi + cena za davku
+"Kura na 30 dni = 50 Kc/den" — vypocet prevodu na denni naklad.
+- Priklady: froyaorganics.com, brainmarket.cz, aktin.cz
+
+### Balicky / sety v detailu
+Upselling primo u produktu — balicky s navaznymi produkty.
+- Priklady: zivina.cz, renovality.cz, ajemfit.cz, ultramenu.cz, svihej.cz
+- Shoptet doplnek: Upsell a Cross-sell Honzy Bartose
+
+### Predplatne na obdobi
+Moznost nakupit jako predplatne.
+- Priklad: froyaorganics.com
+
+### Box "Nevíte si rady"
+Kontakt primo v detailu produktu.
+- S telefonním cislem + e-mailem (trenyrkarna.cz, x-trenink.cz)
+- Jako chatovaci bublina (deadiacosmetics.cz)
+
+### USP lista v detailu produktu
+USP z HP propsane take do detailu produktu.
+
+### "Proc nakoupit u vas" (s fotkami)
+Vizualni prezentace klicovych duvodu primo v detailu.
+- Priklady: koupelnysyrovy.cz (vyborne), goldea.cz (gif animace)
+
+### Doplnkovy prodej (cross-sell)
+Naplnit potrebu zakaznika od A do Z (koberec → nuz na rezani).
+- Priklady: spravny doplnkovy prodej
+- Shoptet: doplnek Upsell a Cross-sell Honza Bartos
+
+### Tip na servirovani / pouziti
+Zvysuje duveryhodnost + odbornost.
+- Priklady: ollies.cz
+
+### Nazor odbornika (TOP produkty)
+U klicovych produktu citovat odbornika s fotografii.
+- Pro niche e-shopy KRITICKE — zakaznik chce odbornost ne genericky popis
+
+### Porovnani "jablka vs hrusky"
+Vizualne porovnat vas produkt s beznymi na trhu.
+- Tabulka / grafika s rozdily
+- Priklady: brainmarket.cz, herbyway.cz, aktin.cz, utrhni.cz
+
+### Univerzalni informace o firme
+Blok s klicovymi informacemi o firme propisane do KAZDEHO detailu produktu.
+- Vytvorime 1x, pouzivame napric e-shopem
+- Argumenty z USP + nase sluzby + odliseni
+- Priklady: utrhni.cz (jak balime, cena dopravy, reklamace, nas pribeh),
+  ollies.cz, goldea.cz (gif), dijanarodriguez, elega.cz
+- Pred/Po ukazky u utrhni.cz: jak balime, cena dopravy, reklamace, nas pribeh
+
+### "Jak balime" video nebo text
+Kratke video nebo textovy popis balení.
+- Priklady: spravne e-shopy
+
+### Recenze na detailu produktu (KRITICKY)
+- Heureka symbol viditelne v pozici
+- Zlate hvezdicky (NIKDY sede)
+- Mobile-friendly zobrazeni
+- 12 ručne vybranych recenzi, rotace
+- Foto reference (goldbee — skvela motivace zakazniku k fotkam)
+- Before/After u kosmetiky, mody, fitness
+- Priklady: herbyway, svihej, cubenest, denatura
+
+### Doplnit FAQ na stranku
+Kratky FAQ primo na detailu produktu.
+- Odpovedi na caste otazky
+- Schema markup pro Google rich snippets
+
+### Parametry pod popiskem (NE v zalozkach)
+Google ignoruje skryty obsah v zalozkach. Zakaznici zalozky zridka klikaji.
+- Ideal: parametry jako rozcestnik / fixni lista
+
+### NE povinna registrace pro oblíbené
+Nikdy nenutit registraci pro zakladni funkce.
+- Vede k opusteni webu
+
+### Kamenna prodejna
+Pokud ma, propagovat MAXIMALNE:
+- Samostatna staticka stranka s fotografiemi prodejny
+- Polozka v hornim menu a patičce
+- Info na detailu produktu (kamenna prodejna = trust)
+- Priklady: brainmarket.cz, udirny.cz, koupelnysyrovy.cz, podlahyplotz.cz
+
+---
+
+## MOBILNI VERZE
+
+### Hamburger menu VPRAVO (ne vlevo)
+Pro vetsinu lidi (pravaci) prijemnejsi na klikani.
+- Priklad: trenyrkarna.cz
+
+### Barevne oddeleni menu polozek
+Informacni polozky (O nas, blog, kontakt) odlisit barevne od produktovych.
+
+### Rozbaleni kategorii spravne
+Nastaveni spravne hierarchie podkategorii.
+
+### Pole "hledat" vzdy viditelne
+Na mobilu pole hledat MUSI byt vzdy videt, ideal i v hamburger menu.
+- "Hybajici se text" v placeholderu
+- Priklady: trenyrkarna.cz, aktin.cz
+
+### Kontrola celeho kosiku na mobilu
+VZDY overit kosik na mobilni verzi — casta chyba.
+
+---
+
+## KOSIK A OBJEDNAVKOVY PROCES
+
+### Predkosik — upsell (KRITICKY)
+Pri pridani do kosiku nabidnout multipacky / varianty.
+- Zvyseni AOV a prumerne hodnoty objednavky
+- Priklady: trenyrkarna.cz (multipack), fabini (rozdilna nabidka)
+- Shoptet: doplnek Upsell a Cross-sell Honza Bartos
+- Pravidlo: nabizet produkty za poslednich 90 dni nejprodavanejsi s danym produktem
+
+### Kosik — cross-sell
+Pred dokoncenim objednavky dalsi doplnkovy prodej.
+- Priklady: konkretni e-shopy
+
+### Doplnkove moznosti v kosiku
+Nabidnout min 3 doplnkove moznosti:
+- Dysko zabaleno
+- Darkove baleni
+- Rychle doruceni (express)
+- Pojisteni produktu
+- Prodlouzena zaruka
+
+### Pojisteni + prodlouzena zaruka (drazsi produkty)
+U produktu nad ~2 000 Kc nabidnout pojisteni.
+- Priklady: alza.cz (vyborne), dalsi
+
+### Slevovy kod — SKRYT za checkbox
+Viditelne pole slevoveho kodu = zakaznici jdou na Google hledat slevu = opousti kosik.
+- Skryt za checkbox "Mam slevovy kod"
+- Po kliknuti se zobrazi pole
+- Priklady: spravne skryte slevove pole
+
+### Honza Kvasnicka — kosik best practices
+Kosik obecne upravovat podle zasad Honzy Kvasnicky (nejlepsi CZ UX designer).
+- Video: https://youtu.be/ka2F0YhP9OQ (cas 4:55)
+
+### Platba QR kodem (KRITICKY)
+QR kod je stale vyuzivanejsi platebni metoda.
+- Pro e-shop VYHODA: neplatite % poplatek z objednavky
+- Cenove zvyhodnit (zakaznik vice zvoli), e-shop usetri poplatek
+- Dulezita textace
+- Priklady: spravne
+
+### Apple Pay / Google Pay (KRITICKY)
+Bez Apple/Google Pay na mobilu e-shop ztraci zakazniky.
+- Dramaticky snizuje friction objednavky
+
+### BNPL (Twisto, Klarna, Alma, Splitty)
+U produktu nad 1 000 Kc BNPL zvysuje konverze o 15-30 %.
+- Zobrazit jako mesicni splatku u ceny na detailu produktu
+- Pro drazsi produkty (kosmetika nad 1 500 Kc, elektronika nad 2 000 Kc) KRITICKE
+
+### Termin dodani i v kosiku
+Zopakovat informaci o dodani i v kosiku.
+
+### Checkout od kroku 2
+Od kroku 2 kosiku: bez menu, bez vyhledavani. Jen logo, telefon s fotkou, jazykovy prepinac.
+- Priklady: inspiraci z kroku 2 a 3 u spravnych e-shopu
+
+### Paticka v checkoutu
+Jen: Obchodni podminky, Ochrana udaju, Kontakt.
+
+### Jednotna barva konverznich tlacitek
+Napric celym webem jedna konverzni barva (nemenit napr. z oranzove na HP na zelenou v kosiku).
+
+### Prihlasit ke svemu uctu — decentně
+Prihlaseni v kosiku NE vyrazne. Zakaznika nesmi mást jako povinnost.
+
+### Progress bar "do dopravy zdarma"
+"Do dopravy zdarma jeste X Kc" zvysuje AOV o 10-20 %.
+
+### Dekovaci stranka
+- Dekovaci video za objednavku
+- Zrecyklovat do systemoveho dekovaciho emailu
+
+### Prazdny kosik
+Nesmi byt prazdny. Nabidnout alternativu, TOP produkty, kontakt.
+
+### Osobni odber
+Adresa + cas vyzvednuti (od-do).
+
+### Limitovana nabidka v upsellu
+FOMO v upsellu zvysuje konverze.
+- Priklady: notino.cz
+
+---
+
+## STATICKE STRANKY
+
+Spolecne pravidlo: staticke stranky NEJSOU text wally. Jsou to emotional commitment.
+Zakaznik nestoji ve vasi kamenne prodejne — musite emoci a vjem dodat digitalne.
+
+### Kontakt / prodejna
+- Fotky lidí, prodejny, tymu
+- Telefonni cisla s osobami
+- Mapa, otvíraci doba
+- Priklady SPRAVNE: svet-koupelny.cz, megapixel.cz, x-hokej.cz, ollies.cz,
+  cestouprirody.eu, koupelnysyrovy.cz, elega.cz, brainmarket.cz
+- Priklady SPATNE: velkoobchod-salony.cz, saloos.cz, sachovezbozi.cz
+
+### O nas / nas pribeh
+- Autenticky pribeh (ne genericky)
+- Fotky zakladatelu
+- Priklady: ollies.cz, utrhni.cz, cokoladovnajanek.cz
+
+### Doprava a platba
+- Vizualne, ne text
+- Priklady: podlahyplotz.cz, svet-koupelny.cz, ikea.cz, x-trenink.cz
+
+### Reklamace
+- Prehlednost + obrazky
+- Pred/Po utrhni.cz
+
+### Kamenna prodejna — vlastni stranka
+- Priklady: brainmarket.cz, udirny.cz, podlahyplotz.cz, koupelnysyrovy.cz
+
+---
+
+## DALSI TIPY (obecne)
+
+### Kolo stesti
+Vyzva na slevove kody / slevu na prvni nakup.
+- Varianta: Koloo (responzivni mobile)
+- Priklady: trenyrkarna.cz, fanda-nhl.cz, bloomrobbins.cz (vlastni verze)
+- Koloo sbira kontakty i z mobilu (plne responzivni)
+
+### Shoptet sablona
+Doporuceni modernich sablon: Apollo, Jupiter, Merkur.
+
+### Nadpisy a texty
+- Nadpisy: https://www.skool.com/eshop-booster-mastermind (article ec0d209b)
+- Texty obecne: https://www.skool.com/eshop-booster-mastermind (article fb1c33cd)
+
+### Certifikace a ocenneni produktu
+Pokud maji produkty certifikace/ocenneni, zobrazit.
+- Priklady: alkohol.cz, bloomrobbins.cz, ketodiet.cz
+
+---
+
+## PRIORITIZACE DOPORUCENI
+
+Pri navrhovani Quick Wins a roadmapy VZDY:
+1. Prioritizovat podle VLN (1. VLNA prvni, 4. VLNA posledni)
+2. Dopad × Narocnost matice
+3. Zacit tim co ma nejvyssi poměr dopad/narocnost v 1. VLNE
+4. Konkretni doporuceni pro TENTO e-shop (ne generik)
+5. Odkazat na priklad z checklistu (napr. "jako to ma herbyway.cz")
+
+## ZAKAZ
+
+NIKDY neporucuj veci ktere nejsou v tomto checklistu jako KRITICKE priority.
+Mimo-checklist polozky mohou byt jen jako doplnujici (MEDIUM/LOW).
+`

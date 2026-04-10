@@ -7,6 +7,7 @@
 
 import { put, list, del, get } from '@vercel/blob'
 import { verifySessionToken, checkAnalyzeRateLimit } from '../../lib/auth.js'
+import { ESHOP_BOOSTER_CHECKLIST } from '../../knowledge/checklist.js'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -710,7 +711,18 @@ AUDIENCE: Report je podklad pro klienta (majitel nebo manažer e-shopu). Srozumi
 
 BYZNYS CÍL: Rychlá identifikace TOP příležitostí pro zvýšení konverzí a obratu. Report není akademická analýza — je to akční plán s měřitelným dopadem.
 
-Znalostni baze:
+===== KLIENTSKY CHECKLIST (NEJVYSSI PRIORITA) =====
+Hodnot web PRIMARNE podle polozek v tomto checklistu. Polozky mimo checklist jsou
+druhorade a nesmi dominovat reportu. Kazde Quick Win MUSI odkazovat na polozku
+z checklistu + jeji VLNU priority (1. VLNA = prvni, 4. VLNA = posledni).
+V sekci CO DELA DOBRE pochval veci ktere web dela dobre ve srovnani s checklistem.
+V TOP 5 QUICK WINS prioritizuj chybejici polozky z 1. VLNY.
+
+${ESHOP_BOOSTER_CHECKLIST}
+
+===== KONEC KLIENTSKEHO CHECKLISTU =====
+
+Doplnujici znalostni baze (nizsi priorita, pouzij jen pro kontext nebo kategorii-specificke detaily):
 ${KRIS_KNOWLEDGE_BASE}
 ${shopContextBlock}
 ${metaContext}
