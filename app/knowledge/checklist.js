@@ -114,11 +114,19 @@ Polozky (individualne podle e-shopu, na zaklade dat):
 - Jak pouzivat produkty
 - Caste dotazy (FAQ)
 - Recenze (POVINNE)
-- O nas
+- O nas — zakaznik vidi ze jste odbornik ve svem segmentu (denatura.cz, mojemana.cz)
+- Proc nase produkty — proc si vybrat vas (navaznost na USP)
 - Nase odliseni / Proc nakoupit u nas
 - Kamenna prodejna (pokud ma)
 ZAKAZANO: Obchodni podminky v menu (patri do paticky)
 - Priklady: brainmarket.cz, balistas.cz, mountfield.cz, tescoma.cz, herbyway.cz
+
+### Prodejna v menu + horni liste ("Prodejte co delate")
+Pokud mate kamennou prodejnu, MUSI byt viditelne v menu nebo horni liste.
+- Zvysuje duveryhodnost znacky + prodava ze jste realna firma
+- Priklady: rcprofi.cz (prodejna viditelne v menu)
+- Propagace kamenne prodejny: menu → samostatna stranka → patička → detail produktu
+  (nezapomenout ji zobrazit na vsech tech mistech aby zakaznik nahodne narazil)
 
 ### Viditelny kontakt v hlavicce (KRITICKY)
 Telefon + email rovnou v hlavicce WEBU + OBLICEJ poradkyne + zelene/cervene kolecko
@@ -172,7 +180,15 @@ Teprve kombinace tri mist vytvari "hokejkovy efekt" v trzbach (data od Honzy Bar
 - Kazdy banner musi mit CTA tlacitko (vyzvu k akci)
 - Bez CTA = mnohem nizsi proklikovost
 - Slider musi splnovat "squint test" (hlavni sdeleni musi byt citelne i kdyz sklapnete oci)
-- SPRAVNE: hannibal.cz, brainmarket.cz, alza.cz (loga partneru upazadena)
+- SPRAVNE: hannibal.cz, brainmarket.cz, alza.cz (loga partneru upozadena)
+
+### CTA textace na bannerech (1. VLNA TIP)
+Misto genericke "Zobrazit vice" pouzivat emotional-action textace:
+- "Jdu nam poridit zazitek" (kava.cz)
+- "Chci vyzkouset" (aktivni akce)
+- "Hledam svuj produkt" (sprava orientace)
+- "Zacnu setrit" (hodnota)
+Priklady: hanibal.cz, kava.cz
 
 ### Staticke hero
 Staticke hero s JEDNOU nabidkou a JEDNOU vyzvou je casto lepsi nez slider.
@@ -233,9 +249,20 @@ Dlazdice na HP jsou VYRAZNY podil na proklikovosti (Clarity data z trenyrkarna.c
 
 ### Text na HP s vnitrnim prolinkovanim
 Pokud se na HP uziva text, MUSI obsahovat vnitrni prolinkovani na klicove kategorie a staticke stranky.
-Bez prolinkovani = nevyuzity SEO potencial.
+Bez prolinkovani = nevyuzity SEO potencial + zakaznik se "nedostane dal".
+- Text nesmi byt genericky SEO filler — musi rikat NECO o znacce/produktu co stoji za cteni
+- Idealne prolinkovat min na 3-5 klicovych kategorii + 2-3 staticke stranky
 - Priklady kvalitneho textu HP: herbyway.cz, denatura.cz
-- Varianta: kratke video (donlemme.cz)
+- Alternativa: kratke VIDEO namisto textu — ukazte co delate
+  - Priklad: donlemme.cz (video na HP)
+  - KRITICKE: Pokud mate video, recyklujte ho na stranku "O nas" a do systemovych emailu
+    — zakaznik ho tam ocekava a potvrdi si autenticitu
+
+### Foto reference motivace zakazniku
+Pokud chcete foto reference na HP, MUSITE zakazniky aktivne motivovat aby fotky posilali.
+- Priklad motivace: goldbee (vyzva "poslete nam fotku + ziskate slevu na dalsi nakup")
+- Foto reference konvertuji 2x lepe nez textove
+- Recyklovat foto reference do galerie produktu (viz DETAIL sekce)
 
 ### Newsletter subscription
 Vyzva "prihlasit se k odberu" musi byt zpracovana zajimave s ukazkou produktu.
@@ -259,11 +286,18 @@ Vyuzit potencial na maximum.
 - Dynamicky titulek s aktualni slevou (benu.cz)
 
 ### Popis kategorie
-NE dlouhy SEO text — max 3-5 vet.
-- Misto SEO textu: zvyseni kredibility + rozcestnik na informace
-- Varianta "Informace navrch, Zjistete vice na konci" (prolinkovani dolu)
-- SEO princip: psat pro lidi, ne pro vyhledavace
-- Priklady: profiDJ (odbornost), grilovani.cz
+NE dlouhy SEO text — max 3-5 vet na zacatku.
+- Misto SEO textu: zvyseni kredibility + rozcestnik na informace o kategorii
+- Ukazat odbornost v segmentu (profiDJ pattern: "My tomu rozumime, tady jsou duvody...")
+- SEO princip: psat pro LIDI, ne pro vyhledavace
+
+### SEO text pattern "Zjistete vice"
+Dobry vzor kombinace SEO + UX:
+1. Na zacatku kategorie: KRATKE duleziite informace (3-5 vet)
+2. Odkaz "Zjistete vice o [kategorii]" na konec stranky
+3. Dole detailni SEO text pro Google (plny obsah, h2, h3, prolinkovani)
+- Vysledek: zakaznik vidi jen to podstatne nahoru, SEO ma plny obsah dole
+- Priklad: hudy.cz
 
 ### Dynamicky title pri filtrovani
 Pri filtrovani "nejlevnejsi" zmenit title a nadpis na "Levne [kategorie]".
@@ -320,7 +354,33 @@ Chybi-li CTA tlacitko pod produktem v kategorii, proklikovost klesa.
 
 ### Poradi produktu
 Nejprodavanejsi produkty na prvnich mistech.
-- "Zvyraznit nejprodavanejsi stitkem s poradim prodejnosti v kategorii"
+- Zvyraznit TOP 5-6 nejprodavanejsich specialnim stitkem s POZICI prodejnosti v kategorii
+  (napr. "#1 nejprodavanejsi", "#2 nejprodavanejsi")
+- Stitky "lidovka" / "zlata stredni cesta" / "pro narocne" maji brutalni vliv na konverze
+- Pokud stitky pro e-shop nejsou vhodne, nahradit vlastnimi "pecetemi" / ocennenim
+
+### 5 pravidel pro zarazeni produktu do vypisu TOP kategorie
+Aby se produkt dostal do kategorie nejprodavanejsich / TOP vyber, MUSI splnit vsechna:
+1. Ma fotku (kvalitni, min 1 000 px sirka)
+2. Je skladem (realna dostupnost z API, ne "do 3 tydnu")
+3. Ma aktivni prodeje za poslednich 30 dni (nemrtvy produkt)
+4. Cena alespon 500 Kc (aby se vyplatilo ho propagovat)
+5. Marze alespon 40 % (aby prodeje davaly byznys smysl)
+
+### Lista "nejprodavanejsi produkty" v kategorii
+Pokud neni podlozeno daty ze TAHAJI konverze, DAT PRYC.
+- Nikdy nezobrazovat produkty ktere nejsou skladem
+- Pokud zustane, aplikovat 5 pravidel vyse
+
+### Seznam "TOP produkty" v levem menu kategorie
+Pokud neni podlozeno daty ze funguje na konverze, DAT PRYC.
+- Boční menu je vetsinou zbytecne
+- Pokud zustane, pouzit ho radeji na filtry
+
+### Bočni menu kategorie
+Boční menu je vetsinou zbytecne — zakaznik se orientuje horní navigaci.
+- Pouzit jen pokud je specificky duvod + data
+- Pokud zustane, vyuzit na ZOBRAZENY (rozbaleny) filtr, ne na TOP produkty
 
 ---
 
@@ -328,9 +388,12 @@ Nejprodavanejsi produkty na prvnich mistech.
 
 ### Cesky nazev
 NE anglicke nazvy. Cesky popis produktu v nazvu.
-- Pripadne parovani s Heurekou resit feedem, ne nazvem
-- Pokud menite nazev existujiciho produktu, NEMENIT URL
-- Priklady spatne: anglicky nazev granuli. Spravne: "Granule z kacniho masa..."
+- E-shopy casto argumentuji "anglicky nazev kvuli Heurece" — NENI PRAVDA
+- Parovani s Heurekou se resi pres FEED a nastroje tretich stran, ne pres nazev
+- Cesky nazev je pro zakaznika daleko prijemnejsi a pochopitelnejsi
+- KRITICKE pravidlo SEO: Pokud menite nazev uz existujiciho produktu, NIKDY
+  nemente URL (jinak prijdete o SEO pozice a linky z minulosti)
+- Priklady spatne: "BarkBox Salmon Treats 200g". Spravne: "Granule z lososa pro psy 200g"
 
 ### Klicove informace v nazvu
 Do nazvu zanest co nejvic hodnotnych informaci.
@@ -351,6 +414,12 @@ Graficke znazorneni benefitu nad/u popisku.
 Pred podrobnym popiskem: bodovy seznam "Co produkt dela / pro koho je".
 - Priklady: denatura.cz, x-trenink.cz, zivina.cz, cubenest.cz
 
+### "Popis pokracuje nize" indikator
+Pokud ma detail produktu kratky popis nad foldem, zakaznikovi sdelit ze popis
+pokracuje dale na strance (jinak scrolluje do prazdna a mysli ze uz nic neni).
+- Priklad: brainmarket.cz
+- Sipka dolu + text "Scrollujte pro vice informaci" nebo "Zobrazit cely popis"
+
 ### Pro koho se hodi / Pro koho se nehodi
 Explicitne oznacit cilove segmenty + kontraindikace.
 - Snizuje vraceni zbozi o 15-20 %
@@ -359,9 +428,16 @@ Explicitne oznacit cilove segmenty + kontraindikace.
 
 ### Termin dodani s "dnes / zitra / pozitri" + datum
 Lidé casto nevedi aktualni datum, ale "dnes/zitra" chapou vsichni.
+- Idealni format: "Objednate-li do 15:00, dorucime ZITRA (15.4.2026)"
+- Slovickovy system: "dnes", "zitra", "pozitri", "do 3 dnu", "pristi tyden"
 - Priklady SPRAVNE: trenyrkarna.cz, cubenest.cz
-- Priklady SPATNE: astratex.cz (jen datum), x-trenink.cz
-- Nastaveni "doruci do": https://www.skool.com/eshop-booster-mastermind (clanek)
+- Priklady SPATNE: astratex.cz (jen datum bez slovickoveho vyrazu), x-trenink.cz
+
+### Textace doruceni: "Dorucime do" > "Muzeme dorucit"
+KRITICKE: Pouzivat AKTIVNI textace "Dorucime do [datum]" namisto pasivni
+"Muzeme dorucit do [datum]". Aktivni = komitment, pasivni = nejistota.
+- "Dorucime" = slib → zakaznik veri
+- "Muzeme dorucit" = podminene → zakaznik vahaji
 
 ### Jen koncove ceny (vcetne DPH)
 Cena bez DPH matlouci. Odstranit.
@@ -487,10 +563,15 @@ Pro vetsinu lidi (pravaci) prijemnejsi na klikani.
 - Priklad: trenyrkarna.cz
 
 ### Barevne oddeleni menu polozek
-Informacni polozky (O nas, blog, kontakt) odlisit barevne od produktovych.
+Informacni polozky (O nas, blog, kontakt) odlisit barevne od produktovych polozek.
+- Zakaznik na mobilu hned rozpozna: "tohle jsou produkty, tamhleto je informace"
+- Bez oddeleni menu vypada jako jeden dlouhy seznam
 
-### Rozbaleni kategorii spravne
-Nastaveni spravne hierarchie podkategorii.
+### Rozbaleni kategorii/podkategorii spravne
+Mobilni menu musi mit spravne nastavene rozbaleni — na klepnuti kategorie
+se rozbali podkategorie INLINE (ne navigace pryc).
+- Zakaznik nevi jak se vratit kdyz ho odnavedu na jinou stranku
+- Hierarchie: Kategorie → klepnuti → podkategorie rozbalene pod ni
 
 ### Pole "hledat" vzdy viditelne
 Na mobilu pole hledat MUSI byt vzdy videt, ideal i v hamburger menu.
@@ -539,10 +620,17 @@ Kosik obecne upravovat podle zasad Honzy Kvasnicky (nejlepsi CZ UX designer).
 
 ### Platba QR kodem (KRITICKY)
 QR kod je stale vyuzivanejsi platebni metoda.
-- Pro e-shop VYHODA: neplatite % poplatek z objednavky
-- Cenove zvyhodnit (zakaznik vice zvoli), e-shop usetri poplatek
-- Dulezita textace
-- Priklady: spravne
+- Pro e-shop VYHODA: neplatite % poplatek z objednavky (platba kartou ~1-2 %)
+- Cenove zvyhodnit (zakaznik vice zvoli) ALE staci i zaradit QR na PRVNI misto
+  v seznamu plateb — zakaznici casto voli prvni moznost
+- KRITICKE: Pozor na textaci QR platby — spatne textace sniZi pouziti
+  (pouzit popis ve stylu "Rychla online platba pres bankovnictvi na 2 kliky")
+- Priklady: konkretni e-shopy v Shoptet prostredi
+
+### Pozice druhu dopravy a platby
+Na prvnich mistech MUSI byt ty druhy dopravy a platby, ktere chcete nejvic prodavat.
+- Zakaznici casto voli prvni moznost
+- Kontrola: jsou na prvnich mistech tve nejrychlejsi/nejvyhodnejsi varianty?
 
 ### Apple Pay / Google Pay (KRITICKY)
 Bez Apple/Google Pay na mobilu e-shop ztraci zakazniky.
@@ -573,14 +661,26 @@ Prihlaseni v kosiku NE vyrazne. Zakaznika nesmi mást jako povinnost.
 "Do dopravy zdarma jeste X Kc" zvysuje AOV o 10-20 %.
 
 ### Dekovaci stranka
-- Dekovaci video za objednavku
-- Zrecyklovat do systemoveho dekovaciho emailu
+Po dokonceni objednavky:
+- DEKOVACI VIDEO za objednavku (osobni, autenticke, zakladatel / team)
+- Zrecyklovat TO SAME video do systemoveho potvrzovaciho emailu
+- Dalsi prvky: kontakt na poradkyni, odkaz na "Co delat dal"
+- Cilem: zakaznik se citi ze udelal spravne rozhodnuti (snizuje vraceni zbozi)
 
 ### Prazdny kosik
-Nesmi byt prazdny. Nabidnout alternativu, TOP produkty, kontakt.
+Prazdny kosik NESMI byt jen textem "Vas kosik je prazdny".
+Musi obsahovat:
+- TOP produkty / bestsellers
+- Posledni prohlednute produkty (pokud mame data)
+- Kontakt na poradkyni
+- Tlacitko "Vratit se do nakupu" → homepage nebo nejdulezitejsi kategorie
+- Cilem: "vratit zakaznika zpet do hry" aby neodesel definitivne
 
 ### Osobni odber
-Adresa + cas vyzvednuti (od-do).
+Adresa + cas vyzvednuti (OD-DO kolika).
+- Spatny priklad: "Osobni odber: Praha" (chybi adresa, hodiny)
+- Spravny priklad: "Osobni odber zdarma — Praha 2, Vinohradska 123
+  Po-Pa 9-18, So 9-12"
 
 ### Limitovana nabidka v upsellu
 FOMO v upsellu zvysuje konverze.
