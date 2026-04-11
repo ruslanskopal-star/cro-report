@@ -43,6 +43,16 @@ odlisit autenticky lidsky obsah od AI obsahu. Google nove hodnoti weby podle:
 "Ukazte ze jste zubar" — prokazte zakaznikovi ze jste odbornik ve svem segmentu.
 Duveryhodnost je u vetsiny e-shopu nejvetsi prostor pro vylepseni.
 
+### Data-driven pristup (Case Studies)
+- **Zbysek Nadenik USP studie**: Absence USP listy napric celym webem
+  prokazatelne snizuje VSECHNY klicove konverzni metriky
+- **Honza Bartos GAP case study**: Hello bar + propsani do kategorie +
+  propsani do detailu produktu = hokejkovy efekt v trzbach behem akci
+- **Statisticky duveryhodna data**: Ne "mysim si" ale "data rikaji"
+- Honza Kvasnicka (UX designer) — referencni autorita pro UX zasady kosiku
+- Honza Bartos — autor Shoptet doplnku "Upsell a Cross-sell"
+- Ruslan Skopal + tym ESHOP BOOSTER — interni metodika
+
 ---
 
 ## 4 VLNY PRIORITIZACE
@@ -96,7 +106,10 @@ Logo musi mit pod sebou "dovetek nazvu" = specializaci e-shopu.
 
 ### Heureka logo mezi logem a vyhledavanim
 Zvysuje duveryhodnost e-shopu + prodava super hodnoceni.
-- Priklad: Oveckarna
+- Zakaznik si podvedome rika "u tohoto e-shopu je vsechno v poradku"
+- Priklad: Oveckarna.cz
+- Alternativa: certifikat Heureka "Overeno zakazniky" — silny trust signal
+  zejmena pro nezname e-shopy
 
 ### Horni lista — hodnoceni e-shopu
 Umistit informace o hodnoceni / spokojenych zakaznicich do horni lišty.
@@ -153,7 +166,16 @@ Musi byt VYRAZNE, zakaznik ho musi hned videt.
 ### Pole pro vyhledavani — mobil (KRITICKY)
 Na mobilu je pole casto "utopene" a neni vubec videt. Musi byt POKIRNE videt,
 ideal i kdyz otevrenem hamburger menu.
+- "Hybajici se text" v placeholderu (rotujici vyhledavany vyraz)
 - Priklady: trenyrkarna.cz, aktin.cz, nazuby.cz, kulina.cz, herbyway.cz
+
+### Naseptavac a "nic nenalezeno" stav
+- Naseptavac: zakaznici kteri vyhledavaji konvertuji 2-3x lepe (statistika)
+- Stav "nic nenalezeno": NIKDY prazdny!
+  - Nabidnout alternativu (podobne produkty, kategorie)
+  - Kontakt (telefon + email na poradkyni)
+  - Vyzva: "Nevite co hledate? Zavolejte nam"
+- Menu na mobilu: ikona 3 car I TEXT "MENU", nikdy seda barva
 
 ### Menu — poradi kategorii podle dat
 Nejprodavanejsi kategorie = prvni. Nejprodavanejsi podkategorie = prvni. Nejprodavanejsi produkt = prvni.
@@ -240,12 +262,18 @@ Vizualne prezentovat proc si zakaznik ma vybrat vase produkty.
 
 ### Rychly rozcestnik (dlazdice)
 Dlazdice na HP jsou VYRAZNY podil na proklikovosti (Clarity data z trenyrkarna.cz).
-- Zvazit rozcestnik podle ucelu/situace (do prace, na dovolenou — tallguys.cz)
-- Rozcestnik podle parametru (kancelarskezidle.com — podle vysky postavy, ceny)
-- Rozcestnik podle mistnosti/stylu (breno.cz)
-- Poradi dlazdic VZDY podle dat prodeju
+- Rozcestnik podle ucelu/situace:
+  - tallguys.cz (do prace, na dovolenou — lifestyle kategorie)
+  - 4camping.cz (ucelove rozdeleni)
+- Rozcestnik podle parametru:
+  - kancelarskezidle.com (podle vysky postavy, ceny)
+  - kancelar24.cz (podobna filtrace parametru)
+- Rozcestnik podle mistnosti/stylu:
+  - breno.cz (druh mistnosti, barva, styl)
+- Poradi dlazdic VZDY podle dat prodeju (nejprodavanejsi prvni)
 - Cilem: zakaznik do "cile" (produkt) na max 3 kliky
-- Priklady: nazuby.cz, kulina.cz, balistas.cz, 4camping.cz
+- Spravne priklady: nazuby.cz, kulina.cz, balistas.cz
+- Spatne priklady: cistimezuby.cz (chybi rozcestnik)
 
 ### Text na HP s vnitrnim prolinkovanim
 Pokud se na HP uziva text, MUSI obsahovat vnitrni prolinkovani na klicove kategorie a staticke stranky.
@@ -260,7 +288,9 @@ Bez prolinkovani = nevyuzity SEO potencial + zakaznik se "nedostane dal".
 
 ### Foto reference motivace zakazniku
 Pokud chcete foto reference na HP, MUSITE zakazniky aktivne motivovat aby fotky posilali.
-- Priklad motivace: goldbee (vyzva "poslete nam fotku + ziskate slevu na dalsi nakup")
+- Priklady motivace:
+  - goldbee.cz (vyzva "poslete nam fotku + ziskate slevu na dalsi nakup")
+  - the2-0brand.com (foto reference z Instagramu)
 - Foto reference konvertuji 2x lepe nez textove
 - Recyklovat foto reference do galerie produktu (viz DETAIL sekce)
 
@@ -386,6 +416,12 @@ Boční menu je vetsinou zbytecne — zakaznik se orientuje horní navigaci.
 
 ## DETAIL PRODUKTU
 
+### SEO nazev — overeni hledanosti
+Pred navrhem SEO nazvu produktu overit co lide skutecne vyhledavaji:
+- Google Trends (trends.google.com) — bezplatny nastroj
+- Ukazuje hledanost terminu dle zeme, regionu, obdobi
+- Volit nazev podle terminu ktere SKUTECNE hledaji, ne ktere si myslime
+
 ### Cesky nazev
 NE anglicke nazvy. Cesky popis produktu v nazvu.
 - E-shopy casto argumentuji "anglicky nazev kvuli Heurece" — NENI PRAVDA
@@ -399,6 +435,14 @@ NE anglicke nazvy. Cesky popis produktu v nazvu.
 Do nazvu zanest co nejvic hodnotnych informaci.
 - Pozornost zakaznika je na nazvu nejvyssi
 - Priklad: aktin.cz (nazvy s kompletni specifikaci)
+
+### Priklady kvalitni popisky produktu (KLICOVE PRODUKTY)
+Vylepsit popisky u TOP 20 % nejdulezitejsich produktu. Referencni e-shopy:
+- aktin.cz/vilgain-testo-na-pizzu (kompletni informace, benefity, pouziti)
+- nomadgoods.com (styl + technicke parametry)
+- naturalprotein.cz/probiotika-a-prebiotika
+- ketodiet.cz/p/proteinove-susenky
+- denatura.cz/serum-na-rasy-denatura (studie, timeline, FAQ)
 
 ### Reference primo pod nazvem (KRITICKY)
 Hvezdicky + pocet recenzi primo pod nazvem produktu.
@@ -444,14 +488,18 @@ Cena bez DPH matlouci. Odstranit.
 
 ### Skladovost na prodejnach (API)
 Pokud ma kamenne prodejny, zobrazit dostupnost na prodejnach.
-- Realna data z API
-- Pod tlacitkem/rozkliknutim aby nematlo online kupce (Datart, iSetos)
-- Priklad primo v detailu: alza.cz
+- Realna data z API (ne hardcoded)
+- Pod tlacitkem/rozkliknutim aby nematlo online kupce:
+  - Datart.cz (skladovost rozbalitelna)
+  - iSetos.cz (stejny pattern)
+- Primo zobrazeno v detailu: alza.cz (plne transparentni)
+- Cil: neptaklit online kupujici, ale umoznit lokalnim zakaznikum vyzvednut rychle
 
 ### Galerie produktu — infografika (TOP produkty)
 V galerii produktu mit infografiky s klicovymi informacemi.
-- Priklady: spravne infografiky pro TOP produkty
-- Zvysuje konverze az o 80 %
+- Priklad: wolfi-shop.cz (odstavnovac citrusu s infografikou)
+- Zvysuje konverze az o 80 % u klicovych produktu
+- Infografika rika: pro koho je, jak funguje, v cem je lepsi
 
 ### Gif videa v galerii
 Kratke gif video u klicovych produktu.
@@ -487,6 +535,10 @@ Moznost nakupit jako predplatne.
 Kontakt primo v detailu produktu.
 - S telefonním cislem + e-mailem (trenyrkarna.cz, x-trenink.cz)
 - Jako chatovaci bublina (deadiacosmetics.cz)
+- KRITICKE: Na mobilu MUSI cislo i email fungovat po prokliknutí:
+  - tel: link → okamzite otevre volani (tel:+420...)
+  - mailto: link → okamzite otevre prazdnou zpravu
+- Bez click-to-call / click-to-mail je efekt boxu v mobilu mnohem nizsi
 
 ### USP lista v detailu produktu
 USP z HP propsane take do detailu produktu.
@@ -588,9 +640,12 @@ VZDY overit kosik na mobilni verzi — casta chyba.
 ### Predkosik — upsell (KRITICKY)
 Pri pridani do kosiku nabidnout multipacky / varianty.
 - Zvyseni AOV a prumerne hodnoty objednavky
-- Priklady: trenyrkarna.cz (multipack), fabini (rozdilna nabidka)
-- Shoptet: doplnek Upsell a Cross-sell Honza Bartos
-- Pravidlo: nabizet produkty za poslednich 90 dni nejprodavanejsi s danym produktem
+- Priklady:
+  - trenyrkarna.cz (multipack: vyber vice ks za nizsi cenu)
+  - fabini.cz (rozdilna nabidka nez v kosiku — odlisne produkty)
+- Shoptet: doplnek Upsell a Cross-sell od Honzy Bartose
+- Pravidlo: nabizet produkty ktere byly za poslednich 90 dni NEJPRODAVANEJSI
+  s danym produktem (ne genericka TOP nabidka)
 
 ### Kosik — cross-sell
 Pred dokoncenim objednavky dalsi doplnkovy prodej.
@@ -694,12 +749,24 @@ Spolecne pravidlo: staticke stranky NEJSOU text wally. Jsou to emotional commitm
 Zakaznik nestoji ve vasi kamenne prodejne — musite emoci a vjem dodat digitalne.
 
 ### Kontakt / prodejna
-- Fotky lidí, prodejny, tymu
-- Telefonni cisla s osobami
-- Mapa, otvíraci doba
-- Priklady SPRAVNE: svet-koupelny.cz, megapixel.cz, x-hokej.cz, ollies.cz,
-  cestouprirody.eu, koupelnysyrovy.cz, elega.cz, brainmarket.cz
-- Priklady SPATNE: velkoobchod-salony.cz, saloos.cz, sachovezbozi.cz
+- Fotky lidí, prodejny, tymu (autenticke, ne stock fotky)
+- Telefonni cisla s osobami + statusem online/offline
+- Mapa, otvíraci doba konkretne (Po-Pa 9-18, So 9-12)
+- Priklady SPRAVNE:
+  - svet-koupelny.cz (vidi se vse dulezite + fotky davaji duveryhodnost)
+  - megapixel.cz
+  - x-hokej.cz
+  - ollies.cz
+  - cestouprirody.eu
+  - koupelnysyrovy.cz (dve varianty)
+  - elega.cz
+  - brainmarket.cz
+- Priklady SPATNE:
+  - velkoobchod-salony.cz (chybi autenticita)
+  - saloos.cz
+  - sachovezbozi.cz
+  - dracek.cz (hromada textu kterou nikdo neprecte)
+  - keeostore.cz (nevyuzity potencial)
 
 ### O nas / nas pribeh
 - Autenticky pribeh (ne genericky)
@@ -715,7 +782,20 @@ Zakaznik nestoji ve vasi kamenne prodejne — musite emoci a vjem dodat digitaln
 - Pred/Po utrhni.cz
 
 ### Kamenna prodejna — vlastni stranka
-- Priklady: brainmarket.cz, udirny.cz, podlahyplotz.cz, koupelnysyrovy.cz
+Samostatna staticka stranka s fotografiemi prodejny + adresou + otviracimi hodinami.
+- SPRAVNE priklady:
+  - brainmarket.cz (rozcestnik + jednotlive stranky)
+  - udirny.cz (jednoducha ale funkcni)
+  - vseprogril.cz
+  - podlahyplotz.cz
+  - koupelnysyrovy.cz
+- SPATNE priklady (nevyuzity potencial):
+  - sperkystuchlik.cz
+  - dracek.cz
+  - diskontni-nakupy.cz
+  - filtry-vodni.cz (nehezke fotky)
+- Propagace: samostatna stranka → menu → patička → detail produktu
+  (priklad detailu s kamennou prodejnou: shop.axello.eu, elega.cz)
 
 ---
 
@@ -723,9 +803,11 @@ Zakaznik nestoji ve vasi kamenne prodejne — musite emoci a vjem dodat digitaln
 
 ### Kolo stesti
 Vyzva na slevove kody / slevu na prvni nakup.
-- Varianta: Koloo (responzivni mobile)
-- Priklady: trenyrkarna.cz, fanda-nhl.cz, bloomrobbins.cz (vlastni verze)
-- Koloo sbira kontakty i z mobilu (plne responzivni)
+- Sluzba Koloo (responzivni i na mobilu, plne funguje)
+- Priklady pres Koloo: trenyrkarna.cz, fanda-nhl.cz, tvorboshop.cz
+- Vlastni verze: bloomrobbins.cz
+- Koloo vyhoda: sbira kontakty i z mobilnich uzivatelu
+  (tradicni kola stesti na mobilu nefunguji)
 
 ### Shoptet sablona
 Doporuceni modernich sablon: Apollo, Jupiter, Merkur.
