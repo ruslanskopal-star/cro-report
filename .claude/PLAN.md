@@ -19,10 +19,18 @@
 10. Odstranen Clarity API fetch (3 denni data = marginalni hodnota) — ~200 radku kodu pryc, 8× CLARITY_API_TOKEN_* env vars smazane z Vercelu
 11. Autodetekce Clarity z HTML homepage (`clarity.ms/tag|static.clarity.ms`) — bez checkboxu v UI
 12. Klientsky CRO checklist z Google Docu (Ruslan + kolegove) v `app/knowledge/checklist.js`:
+    - 838 radku, 95 unikatnich CZ referencnich webu (pozitivni i negativni priklady)
     - Google duveryhodnostni matice, skore kvality 0-99
     - 4 VLNY prioritizace (1. VLNA = max, 4. VLNA = nejpozdeji)
     - Strukturovane sekce: Hlavicka, HP, Kategorie, Detail, Mobil, Kosik, Staticke stranky
-    - Priklady z CZ webu: denatura.cz, herbyway.cz, trenyrkarna.cz, koupelnysyrovy.cz, ollies.cz, brainmarket.cz, utrhni.cz, aktin.cz, x-trenink.cz, atd.
+    - Case studies: Zbysek Nadenik (USP), Honza Bartos (GAP hello bar hokejkovy efekt),
+      Honza Kvasnicka (UX kosik), Ruslan + ESHOP BOOSTER metodika
+    - Klicove weby: denatura.cz, herbyway.cz, trenyrkarna.cz, koupelnysyrovy.cz,
+      ollies.cz, brainmarket.cz, utrhni.cz, aktin.cz, x-trenink.cz, kulina.cz,
+      nazuby.cz, balistas.cz, svihej.cz, zivina.cz, ebenica.cz, pepperfield.cz,
+      ketodiet.cz, froyaorganics.com, bloomrobbins.cz, alza.cz, a mnoho dalsich
+    - Negativni priklady: sperkystuchlik.cz, dracek.cz, diskontni-nakupy.cz,
+      filtry-vodni.cz, velkoobchod-salony.cz, keeostore.cz, tescoma.cz hello bar
     - Checklist se injektuje do system promptu s NEJVYSSI prioritou
 13. Tri-vrstvy format doporuceni: `[CRO PRINCIP]` / `[SEGMENT]` / `[JAK OVERIT V CLARITY]` (treti vrstva je navod kam kliknout, ne fake data)
 14. 401 handling: expired token → automaticky vyhozeni na login screen (preflight, upload, analyze)

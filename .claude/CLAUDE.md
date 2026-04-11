@@ -160,6 +160,9 @@ git push             # Auto-deploy na Vercel z main (~60s)
 ✅ Bez authTokenu vše skryté (historie, analýza, patička)
 ✅ `scripts/read-latest-report.js` pro čtení reportů z Blob
 ✅ Otestováno na denatura.cz (76/100, konkrétní citace, VLNY fungují)
+✅ Checklist kompletne rozsireny (3 pruchody dokumentem): 838 radku, 95 unikatnich
+   CZ referencnich webu (pozitivni + negativni priklady), case studies attribution
+   (Zbysek Nadenik USP studie, Honza Bartos GAP hokejkovy efekt, Honza Kvasnicka kosik)
 
 ## Co zbývá — v29 (Referenční weby)
 ❌ Extrahovat z denatura.cz analýzy silné prvky do `knowledge/reference-weby.md`
