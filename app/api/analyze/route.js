@@ -199,6 +199,33 @@ Prvky s nejvyssim dopadem (serazene):
 - Formulare: labely musi byt viditelne, ne jen placeholder
 `
 
+// SSRF prevence — blokuje localhost, RFC1918, link-local, cloud metadata, IPv6 private/loopback
+function isInternalHost(host) {
+  if (!host) return true
+  const h = host.toLowerCase()
+  if (h === 'localhost' || h === '0.0.0.0' || h === '::1' || h === '[::1]') return true
+  if (h.endsWith('.local') || h.endsWith('.internal') || h.endsWith('.localhost')) return true
+  // IPv4 — musi byt presne 4 oktety
+  const v4 = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
+  if (v4) {
+    const o = v4.slice(1).map(Number)
+    if (o.some(n => n > 255)) return true
+    // 0.0.0.0/8, 10.0.0.0/8, 127.0.0.0/8 (loopback), 169.254.0.0/16 (AWS/link-local), 192.168.0.0/16
+    if (o[0] === 0 || o[0] === 10 || o[0] === 127 || (o[0] === 169 && o[1] === 254) || (o[0] === 192 && o[1] === 168)) return true
+    // 172.16.0.0/12 = 172.16 - 172.31 (RFC1918 subset)
+    if (o[0] === 172 && o[1] >= 16 && o[1] <= 31) return true
+    // 100.64.0.0/10 = CGNAT
+    if (o[0] === 100 && o[1] >= 64 && o[1] <= 127) return true
+    return false
+  }
+  // IPv6 — link-local fe80::/10, ULA fc00::/7, multicast ff00::/8, unspecified ::
+  if (h.startsWith('fe8') || h.startsWith('fe9') || h.startsWith('fea') || h.startsWith('feb')) return true
+  if (h.startsWith('fc') || h.startsWith('fd')) return true
+  if (h.startsWith('ff')) return true
+  if (h === '::' || h === '[::]') return true
+  return false
+}
+
 async function fetchOnePage(url, timeoutMs = 8000) {
   try {
     const ctrl = new AbortController()
@@ -325,7 +352,7 @@ export async function POST(req) {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
     if (!verifySessionToken(authToken)) {
       console.warn(`[ANALYZE] UNAUTHORIZED ip=${ip} url=${clientUrl} action=${action || 'analyze'}`)
-      return new Response(JSON.stringify({ error: 'Neautorizovany pristup — zadej kod znovu' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ error: 'Neautorizovany pristup' }), { status: 401, headers: { 'Content-Type': 'application/json' } })
     }
 
     console.log(`[ANALYZE] ${action === 'preflight' ? 'PREFLIGHT' : 'START'} ip=${ip} url=${clientUrl}`)
@@ -342,7 +369,7 @@ export async function POST(req) {
         return new Response(JSON.stringify({ error: 'Neplatne URL — povolene jen http/https' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
       }
       const host = parsed.hostname.toLowerCase()
-      if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host.startsWith('10.') || host.startsWith('192.168.') || host.startsWith('172.') || host.endsWith('.local') || host.endsWith('.internal')) {
+      if (isInternalHost(host)) {
         return new Response(JSON.stringify({ error: 'Interni adresy nejsou povolene' }), { status: 400, headers: { 'Content-Type': 'application/json' } })
       }
     } catch {

@@ -48,6 +48,13 @@ const analyzeLimiter = new Ratelimit({
   prefix: 'ratelimit:analyze',
 })
 
+// Max 200 uploadu za hodinu per IP (DoS/cost prevence)
+const uploadLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(200, '1 h'),
+  prefix: 'ratelimit:upload',
+})
+
 export async function checkAuthRateLimit(ip) {
   const { success } = await authLimiter.limit(ip)
   return success
@@ -56,6 +63,19 @@ export async function checkAuthRateLimit(ip) {
 export async function checkAnalyzeRateLimit(ip) {
   const { success } = await analyzeLimiter.limit(ip)
   return success
+}
+
+export async function checkUploadRateLimit(ip) {
+  const { success } = await uploadLimiter.limit(ip)
+  return success
+}
+
+// Vrati true kdyz session muze pridat dalsi screenshot (limit 30 per session, TTL 2h)
+export async function incrementSessionSlots(sessionId) {
+  const key = `session:slots:${sessionId}`
+  const count = await redis.incr(key)
+  if (count === 1) await redis.expire(key, 7200)
+  return count <= 30
 }
 
 // Signed screenshot URLs (15 min TTL) — token NIKDY nejde do URL

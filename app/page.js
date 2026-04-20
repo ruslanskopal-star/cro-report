@@ -532,7 +532,10 @@ export default function Home() {
     })
     if (sessionId) {
       try {
-        await fetch('/api/upload-screenshot?sessionId=' + sessionId + '&slotId=' + slotId + '&token=' + encodeURIComponent(authToken), { method: 'DELETE' })
+        await fetch('/api/upload-screenshot?sessionId=' + encodeURIComponent(sessionId) + '&slotId=' + encodeURIComponent(slotId), {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + authToken },
+        })
       } catch (e) {}
     }
   }
