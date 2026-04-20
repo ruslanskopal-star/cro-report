@@ -203,14 +203,24 @@ viz memory `project_google_sheets_wif_2026-04-20.md`.
 - ✅ `/api/sheets/test` (session-authed): vraci seznam vsech 13 tabu — **otestovano, funguje**
 - ✅ `/api/sheets/debug` (session-authed): diagnosticky endpoint
 
-**Zbyva pro priste:**
-- ❌ Uzivatel rozhodne ktere tabu zahrnout do system promptu (zatim vsechny zname: Jednotlivé schůzky, Affiliate, Agentury, Marketing, List 1, Home Page, Produktové fotky, Nabídky agentur, Kategorie, Košík, CMS, Procesy, HR)
-- ❌ Strategie sync: A) manualni button, B) cron, C) live fetch — preferuje A pro zacatek
-- ❌ Format pro LLM: markdown tabulky / CSV / JSON
+**Zbyva pro priste — 3 otazky pro uzivatele (zacit timto):**
+
+1. **Ktere tabu do system promptu?** Muj navrh rozdeleni:
+   - CRO analyza (do promptu): Kategorie, Košík, Home Page, Produktové fotky, Procesy?
+   - Pracovni/interni (NE do promptu): Jednotlivé schůzky, Affiliate, Agentury, Nabídky agentur, CMS, HR, Marketing
+   - ???: List 1
+2. **Refresh strategie:** A) manualni button (navrh), B) cron, C) live fetch
+3. **Format pro LLM:** markdown tabulky (navrh) / CSV / JSON
+
+**Implementace po rozhodnuti:**
 - ❌ `/api/sheets/sync` endpoint s ukladanim do Blob
-- ❌ Loader v `/api/analyze/route.js` co injektne relevantni tabu do system promptu
-- ❌ Cleanup: smazat `/api/sheets/debug` po dokonceni (leakuje env info)
+- ❌ Loader v `/api/analyze/route.js` co injektne vybrane tabu do system promptu
+- ❌ Cleanup: smazat `/api/sheets/debug` (leakuje env info)
 - ❌ Cleanup WIF: smazat stare SA binding bez `-projects` sufixu (`owner:ruslanskopal-2939s:project:...`)
+
+**Rozsireni — Google Docs pristup:**
+- Uzivatel chce pridat taky Google Doc: https://docs.google.com/document/d/1CAiBvY3JvObrSBPn2UqP65WRMq1a0z-DYd7iXjKnyFA/edit
+- Potreba: (1) Enable Docs API v GCP `cro-report-sheets`, (2) sdilet Doc s `cro-report-reader@...` Viewer, (3) rozsirit kod o Docs API + scope `documents.readonly`. Existujici WIF token exchange pouzijeme beze zmeny.
 
 ## Co zbývá — v29 (Referenční weby)
 ❌ Extrahovat z denatura.cz analýzy silné prvky do `knowledge/reference-weby.md`

@@ -74,19 +74,44 @@
 **WIF auth hotovo** (viz CLAUDE.md "Google Sheets integrace" + memory
 `project_google_sheets_wif_2026-04-20.md`).
 
-**Pro priste:**
+**Pro priste (3 rozhodovaci otazky + implementace):**
 ```
-1. Uzivatel oznaci ktere tabu zahrnout do system promptu
-   (vsechny je 13, nektere jsou interni — Affiliate, HR, Agentury — nemaji byt v promptu)
-2. Rozhodnout sync strategii:
-   - A) Manualni button (preferovano pro zacatek)
-   - B) Cron 1x denne
-   - C) Live fetch pri kazde analyze
-3. Rozhodnout format pro LLM (markdown tabulky / CSV / JSON)
+1. Ktere tabu do system promptu?
+   Navrh rozdeleni:
+   - CRO analyza (do promptu): Kategorie, Košík, Home Page, Produktové fotky, Procesy?
+   - Pracovni/interni (NE do promptu): Jednotlivé schůzky, Affiliate, Agentury,
+     Nabídky agentur, CMS, HR, Marketing
+   - ???: List 1
+
+2. Sync strategie:
+   - A) Manualni button — admin klik → fetch → Blob (NAVRH)
+   - B) Cron 1x denne — automaticky
+   - C) Live fetch — kazda analyza cte primo (+1s latence)
+
+3. Format pro LLM:
+   - markdown tabulky (NAVRH, citelnejsi)
+   - CSV
+   - JSON
+
+Po rozhodnuti:
 4. Implementovat /api/sheets/sync (auth, ulozi vybrane taby do Blob)
-5. Napojit do app/api/analyze/route.js — injektovat relevantni taby do system promptu
+5. Loader v app/api/analyze/route.js — injektovat taby do system promptu
 6. Cleanup: smazat /api/sheets/debug endpoint (leaky env info)
 7. Cleanup: smazat stare SA binding v GCP (subject bez -projects sufixu)
+```
+
+**Rozsireni v30b — Google Docs pristup:**
+```
+Uzivatel chce pristup i ke Google Doc:
+https://docs.google.com/document/d/1CAiBvY3JvObrSBPn2UqP65WRMq1a0z-DYd7iXjKnyFA/edit
+
+1. Enable Google Docs API v GCP projektu cro-report-sheets:
+   https://console.cloud.google.com/apis/library/docs.googleapis.com?project=cro-report-sheets
+2. Sdilet Doc s service accountem cro-report-reader@cro-report-sheets.iam.gserviceaccount.com (Viewer)
+3. Rozsirit app/lib/google-sheets.js (nebo novy google-docs.js) o Docs API
+4. Pridat scope https://www.googleapis.com/auth/documents.readonly
+   do SA impersonation call
+5. Existujici WIF token exchange se pouzije beze zmeny
 ```
 
 ✅ Hotovo kdyz: analyza klienta vyuzije aktualni data z Google sheetu (napr. referencni weby, kontakty agentur pro doporuceni apod.)
