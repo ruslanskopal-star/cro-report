@@ -1,5 +1,6 @@
 // Google Sheets pres Workload Identity Federation + Vercel OIDC (keyless, zadny JSON klic)
 // Flow: Vercel OIDC token → STS federated token → impersonate service account → Sheets API
+import { getVercelOidcToken } from '@vercel/functions/oidc'
 
 const PROJECT_NUMBER = '251861487049'
 const POOL_ID = 'vercel-pool'
@@ -14,8 +15,9 @@ const TOKEN_TTL_MS = 50 * 60 * 1000 // GCP access tokens platneji 1h, refresh po
 async function getAccessToken() {
   if (cachedToken && Date.now() - cachedAt < TOKEN_TTL_MS) return cachedToken
 
-  const vercelToken = process.env.VERCEL_OIDC_TOKEN
-  if (!vercelToken) throw new Error('VERCEL_OIDC_TOKEN env var not set — OIDC Federation not enabled?')
+  // Token prichazi z request headeru x-vercel-oidc-token (ne env var)
+  const vercelToken = await getVercelOidcToken()
+  if (!vercelToken) throw new Error('Vercel OIDC token missing — OIDC Federation not enabled?')
 
   const audience = `//iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_ID}/providers/${PROVIDER_ID}`
 
