@@ -67,6 +67,32 @@
 
 ---
 
+## v30a — Google Sheets integrace (ROZPRACOVANO 2026-04-20)
+
+**Cil:** Sheet "MC Ruslan Skopal znalostni baze" jako dynamicky zdroj pro system prompt.
+
+**WIF auth hotovo** (viz CLAUDE.md "Google Sheets integrace" + memory
+`project_google_sheets_wif_2026-04-20.md`).
+
+**Pro priste:**
+```
+1. Uzivatel oznaci ktere tabu zahrnout do system promptu
+   (vsechny je 13, nektere jsou interni — Affiliate, HR, Agentury — nemaji byt v promptu)
+2. Rozhodnout sync strategii:
+   - A) Manualni button (preferovano pro zacatek)
+   - B) Cron 1x denne
+   - C) Live fetch pri kazde analyze
+3. Rozhodnout format pro LLM (markdown tabulky / CSV / JSON)
+4. Implementovat /api/sheets/sync (auth, ulozi vybrane taby do Blob)
+5. Napojit do app/api/analyze/route.js — injektovat relevantni taby do system promptu
+6. Cleanup: smazat /api/sheets/debug endpoint (leaky env info)
+7. Cleanup: smazat stare SA binding v GCP (subject bez -projects sufixu)
+```
+
+✅ Hotovo kdyz: analyza klienta vyuzije aktualni data z Google sheetu (napr. referencni weby, kontakty agentur pro doporuceni apod.)
+
+---
+
 ## v30 — Knowledge Base Segmenty
 
 **Cil:** Segment-specificke analyzy s benchmarky

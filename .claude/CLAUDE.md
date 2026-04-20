@@ -188,6 +188,30 @@ git push             # Auto-deploy na Vercel z main (~60s)
 ✅ robots.txt Disallow / (gated aplikace)
 ✅ page.js: `authenticated` boolean misto `authToken`, logout tlacitko, GET /api/auth na mount
 
+## Google Sheets integrace (rozpracované, 2026-04-20)
+
+**WIF auth funguje**, synchronizace do promptu zbyva. Detailni kontext:
+viz memory `project_google_sheets_wif_2026-04-20.md`.
+
+**Hotovo:**
+- ✅ GCP projekt `cro-report-sheets`, service account `cro-report-reader@cro-report-sheets.iam.gserviceaccount.com`
+- ✅ Workload Identity Federation (keyless) — Vercel OIDC token → GCP STS → SA impersonation
+- ✅ WIF provider issuer `https://oidc.vercel.com/ruslanskopal-2939s-projects`
+- ✅ Sheet `1wVoTp...` (13 tabu) sdilen s SA jako Viewer
+- ✅ `app/lib/google-sheets.js`: `fetchSheetMetadata()`, `fetchSheetValues()`, in-memory token cache 50min
+- ✅ Pouziva `getVercelOidcToken()` z `@vercel/functions/oidc` (token je v `x-vercel-oidc-token` header, ne env var)
+- ✅ `/api/sheets/test` (session-authed): vraci seznam vsech 13 tabu — **otestovano, funguje**
+- ✅ `/api/sheets/debug` (session-authed): diagnosticky endpoint
+
+**Zbyva pro priste:**
+- ❌ Uzivatel rozhodne ktere tabu zahrnout do system promptu (zatim vsechny zname: Jednotlivé schůzky, Affiliate, Agentury, Marketing, List 1, Home Page, Produktové fotky, Nabídky agentur, Kategorie, Košík, CMS, Procesy, HR)
+- ❌ Strategie sync: A) manualni button, B) cron, C) live fetch — preferuje A pro zacatek
+- ❌ Format pro LLM: markdown tabulky / CSV / JSON
+- ❌ `/api/sheets/sync` endpoint s ukladanim do Blob
+- ❌ Loader v `/api/analyze/route.js` co injektne relevantni tabu do system promptu
+- ❌ Cleanup: smazat `/api/sheets/debug` po dokonceni (leakuje env info)
+- ❌ Cleanup WIF: smazat stare SA binding bez `-projects` sufixu (`owner:ruslanskopal-2939s:project:...`)
+
 ## Co zbývá — v29 (Referenční weby)
 ❌ Extrahovat z denatura.cz analýzy silné prvky do `knowledge/reference-weby.md`
 ❌ Napojit reference-weby.md do system promptu s instrukcí "inspiruj se"
