@@ -15,7 +15,7 @@
 
 ## Mezi audity: změny architektury (2026-04-11, v28)
 - Přidány 2 nové endpointy: `/api/upload-screenshot` (POST + DELETE), `/api/screenshot` (GET)
-- Oba mají auth check přes `verifySessionToken`
+- Oba mají auth check přes `requireSession`
 - Upload endpoint: validace `sessionId` a `slotId` regex, limit 5MB per screenshot
 - Screenshot endpoint: validace sessionId/slot, cestný prefix `screenshots/{sessionId}/`
 - Odstraněno Clarity API fetch (~200 řádků), 8× CLARITY_API_TOKEN_* env vars smazané
@@ -47,9 +47,9 @@ grep -rn "error: e\.message\|error:.*err\b" app/api/ | grep -v console
 - `app/api/analyze/route.js` — clientUrl: typ, délka (max 200), URL schema (jen http/https), blokované interní adresy
 
 ### Auth na všech endpointech
-- `/api/analyze` — ✅ verifySessionToken
+- `/api/analyze` — ✅ requireSession
 - `/api/auth` — ✅ TOTP (vstupní bod, nepotřebuje session)
-- `/api/reports` — ✅ verifySessionToken (GET/POST/DELETE)
+- `/api/reports` — ✅ requireSession (GET/POST/DELETE)
 - `/api/cron/daily-report` — ✅ CRON_SECRET v Authorization header
 
 ### Rate limiting
@@ -76,10 +76,19 @@ grep -rn "error: e\.message\|error:.*err\b" app/api/ | grep -v console
 Pro každý endpoint ověř:
 
 ### POST /api/auth
-- [ ] Přijímá jen 6-místný číselný kód
-- [ ] Rate limit funguje
+- [ ] Přijímá jen 6-místný číselný kód (/^\d{6}$/)
+- [ ] Rate limit funguje (5/15min)
+- [ ] Set-Cookie: HttpOnly Secure SameSite=Strict, token NENI v response body
 - [ ] Vrací generické chybové hlášky
-- [ ] Loguje IP + výsledek
+- [ ] Loguje IP + výsledek (nikdy token)
+
+### GET /api/auth
+- [ ] Vrací jen `{ authenticated: bool }` — NIKDY token
+- [ ] Pri neplatnem UA hashu vrati `authenticated: false` a cookie smaze
+
+### DELETE /api/auth
+- [ ] Smaze session z Redisu (destroySession)
+- [ ] Clear cookie (Max-Age=0)
 
 ### POST /api/analyze (preflight)
 - [ ] Auth check
@@ -96,9 +105,29 @@ Pro každý endpoint ověř:
 - [ ] Generické error hlášky v SSE
 
 ### GET/POST/DELETE /api/reports
-- [ ] Auth check na všech metodách
+- [ ] `requireSession(req)` na všech metodách
 - [ ] Blob list/save/delete funguje
 - [ ] Content-Type header na všech responses
+
+### POST /api/upload-screenshot
+- [ ] `requireSession(req)` z cookie
+- [ ] Upload rate limit (200/h) + per-session slot limit (30)
+- [ ] Magic-number validace (JPEG/PNG/WebP)
+- [ ] 5MB limit (buffer.length + base64 length check)
+- [ ] sessionId/slotId regex validace
+
+### DELETE /api/upload-screenshot
+- [ ] `requireSession(req)` z cookie (NIKDY token v URL)
+- [ ] sessionId/slotId regex validace
+
+### POST /api/screenshot-urls
+- [ ] `requireSession(req)` z cookie
+- [ ] Vraci signed URLs (sig + expires 15min, HMAC pres TOTP_SECRET)
+
+### GET /api/screenshot
+- [ ] Auth pres signed URL (sig+expires), NE session token
+- [ ] sessionId/slot regex validace
+- [ ] Cache-Control: private, max-age=3600
 
 ### GET /api/cron/daily-report
 - [ ] CRON_SECRET auth

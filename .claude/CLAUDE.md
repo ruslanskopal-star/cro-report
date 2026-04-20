@@ -22,7 +22,7 @@
 | Styling | Inline styly (zadny CSS framework, zadny globals.css) |
 | Backend | Next.js Route Handlers (6 API endpointu) |
 | AI | Anthropic Claude API (@anthropic-ai/sdk), streaming |
-| Auth | TOTP (otpauth) → HMAC session token |
+| Auth | TOTP (otpauth) → random 32B token v Upstash Redis + HttpOnly cookie |
 | Rate Limit | Upstash Redis (@upstash/ratelimit) |
 | Storage | Vercel Blob (private, fra1) |
 | Email | Resend API (cron daily report) |
@@ -39,7 +39,7 @@ app/
 ├── layout.js            ← Root layout (minimal, zadny globals.css)
 ├── icon.svg             ← Favicon
 ├── lib/
-│   └── auth.js          ← Sdileny modul (HMAC tokeny, rate limit)
+│   └── auth.js          ← Sdileny modul (Redis session, UA binding, rate limit, signed URLs)
 ├── knowledge/
 │   └── checklist.js     ← Klientsky CRO checklist (ESHOP BOOSTER, 4 VLNY, referencni weby)
 └── api/
@@ -62,8 +62,8 @@ scripts/
 
 ### Data Flow
 
-1. Uzivatel zada TOTP kod → `POST /api/auth` → overi TOTP → vrati HMAC session token
-2. Uzivatel zada URL → `POST /api/analyze` (action=preflight) → detekce kategorie + otazky
+1. Uzivatel zada TOTP kod → `POST /api/auth` → overi TOTP → vytvori Redis session s UA hashem → Set-Cookie HttpOnly Secure SameSite=Strict (klient token nevidi)
+2. Uzivatel zada URL → `POST /api/analyze` (action=preflight) → `requireSession(req)` cte cookie → detekce kategorie + otazky
 3. Uzivatel nahraje screenshoty → klientsky canvas resize na 1200×1500 JPEG 0.75 →
    `POST /api/upload-screenshot` (per chunk) → Blob `screenshots/{sessionId}/{slotId}.jpg`
 4. Group sloty (homepage/kategorie/produkt/predkosik/kosik): auto-split dlouheho screenshotu
@@ -128,11 +128,14 @@ git push             # Auto-deploy na Vercel z main (~60s)
 ✅ Runtime nodejs + maxDuration 300s (fix timeout)
 
 ## Co je hotovo ve v27
+> **POZOR:** Auth flow prepsan 2026-04-20 — HMAC token + localStorage nahrazeno
+> random Redis sessionem + HttpOnly cookie. Viz "Co je hotovo po hacker auditu" nize.
+
 ✅ Preflight UI otestován živě — funguje
 ✅ Server-side Blob save v route.js (reporty se ukládají automaticky po streamu)
 ✅ Report nadpis: "CRO ANALÝZA" (bez "KRIS")
 ✅ TOTP autentizace (Google Authenticator, ESHOP BOOSTER: CRO Report)
-✅ HMAC session tokeny (24h platnost, secret zůstává na serveru)
+✅ HMAC session tokeny (24h platnost, secret zůstává na serveru) *[superseded 2026-04-20]*
 ✅ Rate limit: 5 auth pokusů/15min + 10 analýz/h per IP (Upstash Redis)
 ✅ Auth na všech endpointech včetně preflight
 ✅ Private Blob storage (přímé URL = 403)
@@ -164,6 +167,27 @@ git push             # Auto-deploy na Vercel z main (~60s)
    CZ referencnich webu (pozitivni + negativni priklady), case studies attribution
    (Zbysek Nadenik USP studie, Honza Bartos GAP hokejkovy efekt, Honza Kvasnicka kosik)
 
+## Co je hotovo po hacker auditu (2026-04-20)
+✅ Session auth: HMAC token → random 32B v Upstash Redis (TTL 24h) + UA binding
+✅ Token presunuty z localStorage do HttpOnly Secure SameSite=Strict cookie
+✅ `app/lib/auth.js` API: `createSession/verifySession/destroySession/requireSession/hashUA`
+✅ `/api/auth`: POST (login + Set-Cookie), GET (session check), DELETE (logout)
+✅ Vsechny API routes: `requireSession(req)` misto `authToken` v body/query
+✅ Signed URLs pro screenshoty (HMAC sig + expires 15min, nezavisle na session)
+✅ CSP header: default-src 'self', connect-src 'self', frame-ancestors 'none', object-src 'none'
+✅ Cache-Control: private, no-store, max-age=0, must-revalidate na vsech /api/*
+✅ Vary: Authorization, Cookie na API responses
+✅ HSTS 2 roky + preload, Cross-Origin-Opener-Policy: same-origin
+✅ CORS explicitni origin (ne *) i pro /(.*)
+✅ SSRF blocklist rozsiren: 169.254/16, 172.16-31/12, CGNAT, IPv6 ULA/link-local
+✅ Upload rate limit: 200/h per IP + per-session limit 30 screenshotu (2h TTL)
+✅ Magic-number validace uploadovanych screenshotu (JPEG/PNG/WebP)
+✅ Jednotne 401 hlasky "Neautorizovany pristup" (nerozlisuje expired vs missing)
+✅ TOTP kod validace: presne 6 cislic (`/^\d{6}$/`)
+✅ X-XSS-Protection odstraneno (deprecated), productionBrowserSourceMaps: false
+✅ robots.txt Disallow / (gated aplikace)
+✅ page.js: `authenticated` boolean misto `authToken`, logout tlacitko, GET /api/auth na mount
+
 ## Co zbývá — v29 (Referenční weby)
 ❌ Extrahovat z denatura.cz analýzy silné prvky do `knowledge/reference-weby.md`
 ❌ Napojit reference-weby.md do system promptu s instrukcí "inspiruj se"
@@ -184,8 +208,8 @@ Kompletni roadmap viz @PLAN.md
 
 ### Naming
 - Soubory: `kebab-case` (route.js, daily-report)
-- Promenne/funkce: `camelCase` (handleAnalyze, authToken)
-- Konstanty: `UPPER_SNAKE_CASE` (LOADING_PHASES, AUTH_KEY, TOKEN_MAX_AGE)
+- Promenne/funkce: `camelCase` (handleAnalyze, authenticated, sessionId)
+- Konstanty: `UPPER_SNAKE_CASE` (LOADING_PHASES, SESSION_COOKIE, HISTORY_KEY)
 - Env vars: `UPPER_SNAKE_CASE` (ANTHROPIC_API_KEY, TOTP_SECRET)
 
 ### Aktualni conventions
